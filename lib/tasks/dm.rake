@@ -126,6 +126,34 @@ namespace :dm do
     $stdout.puts passed ? '통과' : '실패 — 위 숫자를 확인하세요.'
   end
 
+  desc '다른 방의 스레드에 잘못 들어간 DM 을 제 방으로 옮긴다 (APPLY=true 로 실행)'
+  task repair_misplaced: :environment do
+    apply  = ENV['APPLY'] == 'true'
+    result = RepairDmRoomThreadsService.new.call(apply: apply)
+
+    $stdout.puts apply ? '적용합니다.' : '미리보기입니다. 아무것도 바꾸지 않습니다. 적용하려면 APPLY=true 로 다시 실행하세요.'
+    $stdout.puts ''
+
+    result.moves.each do |move|
+      $stdout.puts "  옮김  conversation #{move.conversation_id} (방 #{move.source_room.id}) → 방 #{move.target_room.id} : 글 #{move.statuses.map(&:id).join(', ')}"
+    end
+
+    reasons = {
+      room_history: '그 방의 정상 이력(멤버 변경 전)',
+      edited: '수정된 메시지 — 직접 확인 필요',
+      no_room_for_participants: '같은 참여자의 방이 없음',
+    }
+
+    result.skips.each do |skip|
+      reason = reasons.fetch(skip.reason)
+      $stdout.puts "  둠    conversation #{skip.conversation_id} (방 #{skip.source_room.id}) : 글 #{skip.status_ids.join(', ')} — #{reason}"
+    end
+
+    $stdout.puts "  루트·최신 글을 다시 계산한 방: #{result.healed_room_ids.join(', ')}" if result.healed_room_ids.any?
+    $stdout.puts ''
+    $stdout.puts "옮길 묶음 #{result.moves.size}, 그대로 둔 묶음 #{result.skips.size}, 다시 계산한 방 #{result.healed_room_ids.size}."
+  end
+
   desc '개발·스테이징용 DM 테스트 데이터 생성'
   task seed: :environment do
     require_relative '../mastodon/dm_seeder'

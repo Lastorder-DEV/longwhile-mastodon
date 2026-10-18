@@ -120,9 +120,11 @@ class DmRoom < ApplicationRecord
 
       participant_ids = participants_for(status)
       return if participant_ids.size < 2
+      return if history_of_another_room?(status, participant_ids)
 
       room = find_or_create_for(participant_ids, creator: status.account)
       room.attach_conversation!(status.conversation_id)
+      room.adopt_stray_status!(status) unless room.conversation_attached?(status.conversation_id)
       room.register_status!(status, resurrect: resurrect)
       room
     end
@@ -130,10 +132,64 @@ class DmRoom < ApplicationRecord
     def participants_for(status)
       normalize_ids(status.active_mentions.pluck(:account_id) + [status.account_id])
     end
+
+    def history_of_another_room?(status, participant_ids)
+      owner = Conversation.find_by(id: status.conversation_id)&.dm_room
+
+      return false if owner.nil? || normalize_ids(owner.member_ids) == participant_ids
+
+      boundary = owner.last_member_event_id
+
+      boundary.present? && status.id < boundary
+    end
+
+    def thread_accepts?(thread, participant_ids)
+      thread = thread.reblog if thread.reblog?
+
+      return true if participant_ids.size < 2 || thread.conversation_id.blank?
+
+      room = Conversation.find_by(id: thread.conversation_id)&.dm_room
+
+      return normalize_ids(room.member_ids) == participant_ids if room
+
+      !thread.direct_visibility? || participants_for(thread) == participant_ids
+    end
   end
 
   def attach_conversation!(conversation_id)
     Conversation.where(id: conversation_id, dm_room_id: nil).update_all(dm_room_id: id)
+  end
+
+  def conversation_attached?(conversation_id)
+    conversation_id.present? && Conversation.exists?(id: conversation_id, dm_room_id: id)
+  end
+
+  def adopt_stray_status!(status)
+    status.with_lock do
+      next if conversation_attached?(status.conversation_id)
+
+      Rails.logger.warn { "DmRoom #{id}: status #{status.id} arrived in conversation #{status.conversation_id} of another room; moving it" }
+
+      MoveDmStatusesService.new.call([status], self)
+    end
+  end
+
+  def last_member_event_id
+    Status.direct_visibility
+          .where(conversation_id: conversations.select(:id))
+          .where('statuses.spoiler_text LIKE ?', "#{self.class.sanitize_sql_like(MEMBER_EVENT_PREFIX)}%")
+          .reorder(nil)
+          .maximum(:id)
+  end
+
+  def thread_intact?
+    last_status.present? && root_status.present? &&
+      conversation_attached?(last_status.conversation_id) &&
+      conversation_attached?(root_status.conversation_id)
+  end
+
+  def heal_thread!
+    rewind_last_status! unless thread_intact?
   end
 
   def register_status!(status, resurrect: true)
@@ -154,6 +210,7 @@ class DmRoom < ApplicationRecord
 
   def refresh_root_status!
     conversation_id = last_status&.conversation_id
+    conversation_id = nil unless conversation_attached?(conversation_id)
     new_root_id     = conversation_id && oldest_room_status_id(conversation_id)
 
     return if new_root_id == root_status_id
@@ -221,20 +278,56 @@ class DmRoom < ApplicationRecord
   end
 
   def unread_count_for(account)
-    cursor = dm_room_reads.detect { |read| read.account_id == account.id }
-
-    return 0 if cursor&.last_read_status_id.nil? && read_in_legacy_client?(account)
-
-    scope = visible_statuses_for(account).where.not(account_id: account.id)
-    scope = scope.where(id: (cursor.last_read_status_id + 1)..) if cursor&.last_read_status_id
-
-    scope.count
+    self.class.unread_counts_for([self], account).fetch(id, 0)
   end
 
-  def read_in_legacy_client?(account)
-    legacy = AccountConversation.where(account_id: account.id, conversation_id: conversations.select(:id))
+  UNREAD_CURSOR_JOIN = <<~SQL.squish
+    LEFT OUTER JOIN dm_room_reads
+      ON dm_room_reads.dm_room_id = conversations.dm_room_id
+     AND dm_room_reads.account_id = ?
+  SQL
 
-    legacy.exists? && !legacy.exists?(unread: true)
+  class << self
+    def unread_counts_for(rooms, account)
+      rooms = Array(rooms)
+      return {} if rooms.empty?
+
+      counted_ids = rooms.map(&:id) - legacy_read_room_ids(rooms_without_cursor(rooms, account), account)
+      return {} if counted_ids.empty?
+
+      unread_statuses_in(counted_ids, account).group('conversations.dm_room_id').count
+    end
+
+    private
+
+    def rooms_without_cursor(rooms, account)
+      rooms.select do |room|
+        room.dm_room_reads.detect { |read| read.account_id == account.id }&.last_read_status_id.nil?
+      end
+    end
+
+    def legacy_read_room_ids(rooms, account)
+      return [] if rooms.empty?
+
+      AccountConversation
+        .joins(:conversation)
+        .where(account_id: account.id, conversations: { dm_room_id: rooms.map(&:id) })
+        .group('conversations.dm_room_id')
+        .having('NOT bool_or(account_conversations.unread)')
+        .pluck('conversations.dm_room_id')
+    end
+
+    def unread_statuses_in(room_ids, account)
+      Status
+        .direct_visibility
+        .joins(:conversation, :mentions)
+        .joins(sanitize_sql_array([UNREAD_CURSOR_JOIN, account.id]))
+        .where(conversations: { dm_room_id: room_ids }, mentions: { account_id: account.id, silent: false })
+        .where.not(account_id: account.id)
+        .where.not(id: DmHiddenStatus.status_ids_for(account))
+        .where('dm_room_reads.last_read_status_id IS NULL OR statuses.id > dm_room_reads.last_read_status_id')
+        .reorder(nil)
+    end
   end
 
   def participant_read_states_for(account)

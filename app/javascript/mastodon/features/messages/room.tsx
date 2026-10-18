@@ -221,6 +221,26 @@ const Room: React.FC = () => {
     void dispatch(fetchDmRoomStatuses({ roomId }));
   }, [dispatch, roomId]);
 
+  const statusIds = messageState?.statusIds;
+  const previousStatusIdsRef = useRef<
+    { roomId: string; ids: string[] } | undefined
+  >(undefined);
+
+  useEffect(() => {
+    const previous = previousStatusIdsRef.current;
+
+    previousStatusIdsRef.current =
+      roomId && statusIds ? { roomId, ids: statusIds } : undefined;
+
+    if (!roomId || !statusIds || previous?.roomId !== roomId) return;
+
+    const current = new Set(statusIds);
+
+    if (previous.ids.some((id) => !current.has(id))) {
+      void dispatch(fetchDmRoom({ roomId }));
+    }
+  }, [dispatch, roomId, statusIds]);
+
   useEffect(() => {
     dispatch(setActiveDmRoom({ roomId }));
 
@@ -375,7 +395,6 @@ const Room: React.FC = () => {
         (lastReadId === null || compareIds(entry.id, lastReadId) > 0),
     )?.id;
   }, [entries, readSnapshot]);
-
 
   const readStates = room?.participant_read_states;
 

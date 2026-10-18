@@ -298,6 +298,37 @@ RSpec.describe PostStatusService do
     expect(status2.id).to eq status1.id
   end
 
+  context 'when replying with a direct message into another room\'s thread' do
+    let!(:alice) { Fabricate(:account, username: 'alice') }
+    let!(:bob)   { Fabricate(:account, username: 'bob') }
+    let!(:carol) { Fabricate(:account, username: 'carol') }
+
+    before { allow(Mastodon::DmChat).to receive(:enabled?).and_return(true) }
+
+    it 'starts a separate conversation when the participants differ' do
+      group_root = subject.call(alice, text: '@bob @carol hi', visibility: 'direct')
+      reply      = subject.call(alice, text: '@bob just you', visibility: 'direct', thread: group_root)
+
+      expect(reply.conversation_id).to_not eq group_root.conversation_id
+      expect(reply.in_reply_to_id).to eq group_root.id
+      expect(DmRoom.find_by(participant_key: DmRoom.participant_key_for([alice.id, bob.id])).visible_statuses_for(bob).pluck(:id)).to eq [reply.id]
+    end
+
+    it 'stays in the thread when the participants are the same' do
+      root  = subject.call(alice, text: '@bob hi', visibility: 'direct')
+      reply = subject.call(bob, text: '@alice hello', visibility: 'direct', thread: root)
+
+      expect(reply.conversation_id).to eq root.conversation_id
+    end
+
+    it 'leaves non-direct replies alone' do
+      group_root = subject.call(alice, text: '@bob @carol hi', visibility: 'direct')
+      reply      = subject.call(alice, text: 'followers', visibility: 'private', thread: group_root)
+
+      expect(reply.conversation_id).to eq group_root.conversation_id
+    end
+  end
+
   def create_status_with_options(**options)
     subject.call(Fabricate(:account), options.merge(text: 'test'))
   end

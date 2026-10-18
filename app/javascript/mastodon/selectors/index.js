@@ -24,6 +24,10 @@ export const makeGetStatus = () => {
         return null;
       }
 
+      if (!accountBase) {
+        return null;
+      }
+
       if (statusReblog) {
         statusReblog = statusReblog.set('account', accountReblog);
       } else {

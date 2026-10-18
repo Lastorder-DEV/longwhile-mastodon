@@ -164,6 +164,7 @@ class Status < ApplicationRecord
   # the `dependent: destroy` callbacks remove relevant records
   before_destroy :unlink_from_conversations!, prepend: true
 
+  before_destroy :remember_dm_rooms_holding_self, if: :direct_visibility?
   after_destroy :rewind_dm_room!, if: :direct_visibility?
 
   cache_associated :application,
@@ -422,7 +423,18 @@ class Status < ApplicationRecord
   def rewind_dm_room!
     return unless Mastodon::DmChat.enabled?
 
-    conversation&.dm_room&.rewind_last_status!
+    rooms = DmRoom.where(id: @dm_room_ids_holding_self || dm_room_ids_holding_self).to_a
+    rooms << conversation.dm_room if conversation&.dm_room
+
+    rooms.uniq(&:id).each(&:rewind_last_status!)
+  end
+
+  def remember_dm_rooms_holding_self
+    @dm_room_ids_holding_self = dm_room_ids_holding_self if Mastodon::DmChat.enabled?
+  end
+
+  def dm_room_ids_holding_self
+    DmRoom.where(last_status_id: id).or(DmRoom.where(root_status_id: id)).pluck(:id)
   end
 
   def unlink_from_conversations!

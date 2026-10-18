@@ -22,6 +22,9 @@ class REST::DmRoomSerializer < ActiveModel::Serializer
   end
 
   def unread_count
+    counts = instance_options[:unread_counts]
+    return counts.fetch(object.id, 0) if counts
+
     object.unread_count_for(current_account)
   end
 

@@ -96,8 +96,22 @@ class PostStatusService < BaseService
     # The following transaction block is needed to wrap the UPDATEs to
     # the media attachments when the status is created
     ApplicationRecord.transaction do
+      start_separate_dm_thread!(@status)
       @status.save!
     end
+  end
+
+  def start_separate_dm_thread!(status)
+    return unless Mastodon::DmChat.enabled? && status.direct_visibility? && @in_reply_to.present?
+    return if DmRoom.thread_accepts?(@in_reply_to, dm_participant_ids(status))
+
+    status.conversation = Conversation.create!
+  end
+
+  def dm_participant_ids(status)
+    mentioned = status.mentions.reject { |mention| mention.destroyed? || mention.silent? }.map(&:account_id)
+
+    DmRoom.normalize_ids(mentioned + [status.account_id])
   end
 
   def attach_quote!(status)

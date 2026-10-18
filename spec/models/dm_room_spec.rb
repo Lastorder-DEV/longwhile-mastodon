@@ -311,9 +311,225 @@ RSpec.describe DmRoom do
     end
   end
 
+  describe '.unread_counts_for' do
+    it 'counts several rooms at once, each against its own cursor' do
+      from_bob   = direct_status_from(bob, to: alice)
+      bob_room   = described_class.attach_status!(from_bob)
+      first      = direct_status_from(mark, to: alice)
+      described_class.attach_status!(first)
+      mark_room  = described_class.attach_status!(direct_status_from(mark, to: alice, thread: first))
+      mark_room.dm_room_reads.create!(account: alice, last_read_status_id: first.id)
+
+      expect(described_class.unread_counts_for([bob_room, mark_room.reload], alice)).to eq(bob_room.id => 1, mark_room.id => 1)
+    end
+
+    it 'leaves out rooms with nothing unread' do
+      room = described_class.attach_status!(direct_status_from(alice, to: bob))
+
+      expect(described_class.unread_counts_for([room], alice)).to eq({})
+    end
+
+    it 'does not count a message I hid for myself' do
+      status = direct_status_from(bob, to: alice)
+      room   = described_class.attach_status!(status)
+      DmHiddenStatus.create!(account: alice, status: status)
+
+      expect(described_class.unread_counts_for([room], alice)).to eq({})
+    end
+
+    it 'does not count a message that only mentions me silently' do
+      status = direct_status_from(bob, to: alice)
+      room   = described_class.attach_status!(status)
+      Fabricate(:status, account: bob, visibility: :direct, thread: status).mentions.create(account: alice, silent: true)
+
+      expect(described_class.unread_counts_for([room], alice)).to eq(room.id => 1)
+    end
+
+    it 'applies the legacy reconciliation only to rooms without a cursor' do
+      from_bob  = direct_status_from(bob, to: alice)
+      bob_room  = described_class.attach_status!(from_bob)
+      first     = direct_status_from(mark, to: alice)
+      described_class.attach_status!(first)
+      mark_room = described_class.attach_status!(direct_status_from(mark, to: alice, thread: first))
+      mark_room.dm_room_reads.create!(account: alice, last_read_status_id: first.id)
+
+      AccountConversation.add_status(alice, from_bob)
+      AccountConversation.add_status(alice, first)
+      AccountConversation.where(account_id: alice.id).update_all(unread: false)
+
+      expect(described_class.unread_counts_for([bob_room, mark_room.reload], alice)).to eq(mark_room.id => 1)
+    end
+  end
+
+  describe 'messages that arrive in another room\'s thread' do
+    let!(:group_root) { group_status_from(alice, to: [bob, mark]) }
+    let!(:group_room) { described_class.attach_status!(group_root) }
+
+    it 'moves the message into a conversation of its own room' do
+      stray = direct_status_from(alice, to: bob, thread: group_root)
+      room  = described_class.attach_status!(stray)
+
+      expect(room).to_not eq group_room
+      expect(stray.reload.conversation_id).to_not eq group_root.conversation_id
+      expect(room.conversation_attached?(stray.conversation_id)).to be true
+      expect(room.visible_statuses_for(alice).pluck(:id)).to eq [stray.id]
+    end
+
+    it 'keeps the root of the room inside the room' do
+      stray = direct_status_from(alice, to: bob, thread: group_root)
+      room  = described_class.attach_status!(stray)
+
+      expect(room.root_status.conversation_id).to eq stray.reload.conversation_id
+      expect(described_class.thread_accepts?(room.root_status, described_class.normalize_ids([alice.id, bob.id]))).to be true
+    end
+
+    it 'leaves the other room untouched' do
+      described_class.attach_status!(direct_status_from(alice, to: bob, thread: group_root))
+
+      expect(group_room.reload.last_status_id).to eq group_root.id
+      expect(group_room.visible_statuses_for(alice).pluck(:id)).to eq [group_root.id]
+    end
+
+    it 'carries the legacy conversation row along' do
+      stray = direct_status_from(alice, to: bob, thread: group_root)
+      AccountConversation.add_status(bob, stray)
+
+      described_class.attach_status!(stray)
+
+      expect(AccountConversation.find_by(account_id: bob.id).conversation_id).to eq stray.reload.conversation_id
+    end
+  end
+
+  describe '.thread_accepts?' do
+    let(:pair) { described_class.normalize_ids([alice.id, bob.id]) }
+
+    it 'accepts a reply from the same participants' do
+      root = direct_status_from(alice, to: bob)
+      described_class.attach_status!(root)
+
+      expect(described_class.thread_accepts?(root, pair)).to be true
+    end
+
+    it 'refuses a thread that belongs to a room with other members' do
+      root = group_status_from(alice, to: [bob, mark])
+      described_class.attach_status!(root)
+
+      expect(described_class.thread_accepts?(root, pair)).to be false
+    end
+
+    it 'refuses a direct thread for other participants that no room has claimed yet' do
+      root = group_status_from(alice, to: [bob, mark])
+
+      expect(described_class.thread_accepts?(root, pair)).to be false
+    end
+
+    it 'accepts a direct reply to a public post' do
+      root = Fabricate(:status, account: bob, visibility: :public)
+
+      expect(described_class.thread_accepts?(root, pair)).to be true
+    end
+  end
+
+  describe '#refresh_root_status! when the last message sits in another room\'s thread' do
+    it 'clears the root instead of pointing into that thread' do
+      group_root = group_status_from(alice, to: [bob, mark])
+      described_class.attach_status!(group_root)
+      room = described_class.find_or_create_for([alice.id, bob.id])
+
+      stray = direct_status_from(alice, to: bob, thread: group_root)
+      room.update_columns(last_status_id: stray.id, root_status_id: stray.id)
+
+      room.refresh_root_status!
+
+      expect(room.reload.root_status_id).to be_nil
+    end
+  end
+
+  describe '#heal_thread!' do
+    it 'repairs a room whose root points into another room\'s thread' do
+      group_root = group_status_from(alice, to: [bob, mark])
+      described_class.attach_status!(group_root)
+      room = described_class.find_or_create_for([alice.id, bob.id])
+      own  = direct_status_from(alice, to: bob)
+      room.attach_conversation!(own.conversation_id)
+
+      stray = direct_status_from(alice, to: bob, thread: group_root)
+      room.update_columns(last_status_id: stray.id, root_status_id: group_root.id)
+
+      room.heal_thread!
+
+      expect(room.reload.last_status_id).to eq own.id
+      expect(room.root_status_id).to eq own.id
+      expect(room).to be_thread_intact
+    end
+
+    it 'leaves an intact room alone' do
+      room = described_class.attach_status!(direct_status_from(alice, to: bob))
+      allow(room).to receive(:rewind_last_status!)
+
+      room.heal_thread!
+
+      expect(room).to_not have_received(:rewind_last_status!)
+    end
+  end
+
+  describe 'a pre-change message attached again after the members changed' do
+    it 'leaves it in its room and creates no room for the old roster' do
+      old  = direct_status_from(alice, to: bob)
+      room = described_class.attach_status!(old)
+
+      room.dm_room_members.create!(account: mark)
+      room.update!(participant_key: described_class.participant_key_for([alice.id, bob.id, mark.id]), member_count: 3)
+      event = group_status_from(alice, to: [bob, mark], thread: old)
+      event.update_column(:spoiler_text, described_class::MEMBER_EVENT_PREFIX)
+      described_class.attach_status!(event)
+
+      expect(described_class.attach_status!(old.reload)).to be_nil
+      expect(old.reload.conversation_id).to eq event.conversation_id
+      expect(described_class.count).to eq 1
+    end
+  end
+
+  describe 'deleting a message that another room holds as its root' do
+    it 'rewinds that room on a hard destroy as well' do
+      group_root = group_status_from(alice, to: [bob, mark])
+      described_class.attach_status!(group_root)
+      room = described_class.find_or_create_for([alice.id, bob.id])
+      own  = direct_status_from(alice, to: bob)
+      room.attach_conversation!(own.conversation_id)
+
+      stray = direct_status_from(alice, to: bob, thread: group_root)
+      room.update_columns(last_status_id: stray.id, root_status_id: stray.id)
+
+      stray.destroy!
+
+      expect(room.reload.last_status_id).to eq own.id
+      expect(room.root_status_id).to eq own.id
+    end
+
+    it 'rewinds that room too' do
+      group_root = group_status_from(alice, to: [bob, mark])
+      described_class.attach_status!(group_root)
+      room = described_class.find_or_create_for([alice.id, bob.id])
+
+      stray = direct_status_from(alice, to: bob, thread: group_root)
+      room.update_columns(last_status_id: stray.id, root_status_id: stray.id)
+
+      stray.discard_with_reblogs
+
+      expect(room.reload.root_status_id).to be_nil
+    end
+  end
+
   def direct_status_from(author, to:, thread: nil)
     status = Fabricate(:status, account: author, visibility: :direct, thread: thread)
     status.mentions.create(account: to)
+    status
+  end
+
+  def group_status_from(author, to:, thread: nil)
+    status = Fabricate(:status, account: author, visibility: :direct, thread: thread)
+    to.each { |account| status.mentions.create(account: account) }
     status
   end
 end

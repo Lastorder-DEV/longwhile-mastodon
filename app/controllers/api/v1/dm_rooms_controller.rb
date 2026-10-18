@@ -25,10 +25,13 @@ class Api::V1::DmRoomsController < Api::BaseController
            each_serializer: REST::DmRoomSerializer,
            current_account: current_account,
            hidden_status_ids: hidden_last_status_ids(@rooms),
+           unread_counts: DmRoom.unread_counts_for(@rooms, current_account),
            relationships: StatusRelationshipsPresenter.new(@rooms.filter_map(&:last_status), current_account.id)
   end
 
   def show
+    @room.heal_thread!
+
     render_room(@room)
   end
 
@@ -47,7 +50,7 @@ class Api::V1::DmRoomsController < Api::BaseController
 
   def read
     target_id = params[:status_id].presence
-    raise Mastodon::ValidationError, I18n.t('dm_rooms.errors.unknown_status') if target_id.present? && !@room.visible_statuses_for(current_account).exists?(id: target_id)
+    raise Mastodon::ValidationError, I18n.t('dm_rooms.errors.unknown_status') if target_id.present? && !readable_status?(target_id)
 
     cursor   = DmRoomRead.create_or_find_by!(dm_room_id: @room.id, account_id: current_account.id)
     advanced = cursor.advance_to!(target_id || @room.last_status_id)
@@ -96,6 +99,10 @@ class Api::V1::DmRoomsController < Api::BaseController
 
   def set_room
     set_dm_room_membership!(params[:id])
+  end
+
+  def readable_status?(status_id)
+    status_id.to_i == @room.last_status_id || @room.visible_statuses_for(current_account).exists?(id: status_id)
   end
 
   def requested_account_ids

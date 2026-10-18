@@ -52,6 +52,17 @@ RSpec.describe 'API V1 DM rooms' do
       expect(room.reload.last_status_id).to_not be_nil
     end
 
+    it 'reports each room its own unread count' do
+      quiet = attach(direct_status(me, partner))
+      busy  = attach(direct_status(stranger, me))
+      attach(direct_status(stranger, me, thread: busy.last_status))
+
+      get '/api/v1/dm_rooms', headers: headers
+
+      counts = response.parsed_body.to_h { |room| [room['id'], room['unread_count']] }
+      expect(counts).to eq(quiet.id.to_s => 0, busy.id.to_s => 2)
+    end
+
     it 'does not list a room I left' do
       room = attach(direct_status(me, partner))
       room.dm_room_members.find_by(account_id: me.id).hide!
@@ -78,6 +89,21 @@ RSpec.describe 'API V1 DM rooms' do
       get "/api/v1/dm_rooms/#{room.id}", headers: headers
 
       expect(response).to have_http_status(404)
+    end
+
+    it 'repairs a root that points into another room's thread' do
+      group_root = direct_status(me, partner)
+      group_root.mentions.create(account: stranger)
+      attach(group_root)
+
+      room  = DmRoom.find_or_create_for([me.id, partner.id])
+      stray = direct_status(me, partner, thread: group_root)
+      room.update_columns(last_status_id: stray.id, root_status_id: group_root.id)
+
+      get "/api/v1/dm_rooms/#{room.id}", headers: headers
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body['root_status_id']).to be_nil
     end
 
     it 'still returns a room I left' do
@@ -200,6 +226,20 @@ RSpec.describe 'API V1 DM rooms' do
       post "/api/v1/dm_rooms/#{room.id}/read", params: { status_id: other.id }, headers: headers
 
       expect(response).to have_http_status(422)
+    end
+
+    it 'accepts the room's own last status even when it sits outside the room' do
+      group_root = direct_status(partner, me)
+      group_root.mentions.create(account: stranger)
+      attach(group_root)
+
+      room  = DmRoom.find_or_create_for([me.id, partner.id])
+      stray = direct_status(partner, me, thread: group_root)
+      room.update_columns(last_status_id: stray.id)
+
+      post "/api/v1/dm_rooms/#{room.id}/read", params: { status_id: stray.id }, headers: headers
+
+      expect(response).to have_http_status(200)
     end
 
     it 'rejects a status id that does not exist' do

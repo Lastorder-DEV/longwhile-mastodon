@@ -55,6 +55,15 @@ module WebAppControllerConcern
     request.format = :html if request.format == :zip
   end
 
+  # On a private instance the API rejects signed-out requests, so the web app
+  # would only show 401s with no way to reach the login form.
+  def redirect_unauthenticated_to_sign_in!
+    return if user_signed_in?
+    return unless ENV['DISALLOW_UNAUTHENTICATED_API_ACCESS'] == 'true' || limited_federation_mode?
+
+    redirect_to new_user_session_path
+  end
+
   def redirect_to_tos_interstitial!
     return unless current_user&.require_tos_interstitial?
 
