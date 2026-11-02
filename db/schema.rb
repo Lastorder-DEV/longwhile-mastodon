@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_10_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_12_100200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -360,6 +360,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_000000) do
     t.string "uri"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.bigint "dm_room_id"
+    t.index ["dm_room_id"], name: "index_conversations_on_dm_room_id"
     t.index ["uri"], name: "index_conversations_on_uri", unique: true, opclass: :text_pattern_ops, where: "(uri IS NOT NULL)"
   end
 
@@ -415,6 +417,62 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_000000) do
     t.datetime "updated_at", precision: nil, null: false
     t.integer "action", default: 0, null: false
     t.index ["account_id"], name: "index_custom_filters_on_account_id"
+  end
+
+  create_table "dm_hidden_statuses", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "status_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status_id"], name: "index_dm_hidden_statuses_on_account_id_and_status_id", unique: true
+    t.index ["status_id"], name: "index_dm_hidden_statuses_on_status_id"
+  end
+
+  create_table "dm_room_members", force: :cascade do |t|
+    t.bigint "dm_room_id", null: false
+    t.bigint "account_id", null: false
+    t.datetime "hidden_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "dm_room_id"], name: "index_dm_room_members_on_account_id_and_dm_room_id", unique: true
+    t.index ["dm_room_id"], name: "index_dm_room_members_on_dm_room_id"
+  end
+
+  create_table "dm_room_nicknames", force: :cascade do |t|
+    t.bigint "dm_room_id", null: false
+    t.bigint "account_id", null: false
+    t.bigint "target_account_id", null: false
+    t.string "nickname", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["dm_room_id", "account_id", "target_account_id"], name: "index_dm_room_nicknames_on_room_and_pair", unique: true
+    t.index ["target_account_id"], name: "index_dm_room_nicknames_on_target_account_id"
+  end
+
+  create_table "dm_room_reads", force: :cascade do |t|
+    t.bigint "dm_room_id", null: false
+    t.bigint "account_id", null: false
+    t.bigint "last_read_status_id"
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["dm_room_id", "account_id"], name: "index_dm_room_reads_on_dm_room_id_and_account_id", unique: true
+    t.index ["last_read_status_id"], name: "index_dm_room_reads_on_last_read_status_id"
+  end
+
+  create_table "dm_rooms", force: :cascade do |t|
+    t.string "participant_key", null: false
+    t.integer "member_count", default: 0, null: false
+    t.string "title"
+    t.bigint "root_status_id"
+    t.bigint "last_status_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "creator_id"
+    t.index ["creator_id"], name: "index_dm_rooms_on_creator_id"
+    t.index ["last_status_id"], name: "index_dm_rooms_on_last_status_id"
+    t.index ["participant_key"], name: "index_dm_rooms_on_participant_key", unique: true
+    t.index ["root_status_id"], name: "index_dm_rooms_on_root_status_id"
   end
 
   create_table "domain_allows", force: :cascade do |t|
@@ -795,12 +853,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_000000) do
     t.boolean "multi_account", default: false, null: false
     t.string "purpose", limit: 50
     t.boolean "long_lived", default: false, null: false
+    t.index ["multi_account", "long_lived"], name: "index_oauth_access_tokens_on_multi_account_and_long_lived"
+    t.index ["multi_account"], name: "index_oauth_access_tokens_on_multi_account"
+    t.index ["purpose"], name: "index_oauth_access_tokens_on_purpose"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true, opclass: :text_pattern_ops, where: "(refresh_token IS NOT NULL)"
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id", where: "(resource_owner_id IS NOT NULL)"
     t.index ["token"], name: "index_oauth_access_tokens_on_token", unique: true
-    t.index ["multi_account"], name: "index_oauth_access_tokens_on_multi_account"
-    t.index ["multi_account", "long_lived"], name: "index_oauth_access_tokens_on_multi_account_and_long_lived"
-    t.index ["purpose"], name: "index_oauth_access_tokens_on_purpose"
   end
 
   create_table "oauth_applications", force: :cascade do |t|
@@ -1153,9 +1211,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_000000) do
     t.integer "quote_approval_policy", default: 0, null: false
     t.index ["account_id", "id", "visibility", "updated_at"], name: "index_statuses_20190820", order: { id: :desc }, where: "(deleted_at IS NULL)"
     t.index ["account_id"], name: "index_statuses_on_account_id"
+    t.index ["conversation_id"], name: "index_statuses_on_conversation_id"
     t.index ["deleted_at"], name: "index_statuses_on_deleted_at", where: "(deleted_at IS NOT NULL)"
     t.index ["id", "account_id"], name: "index_statuses_local_20190824", order: { id: :desc }, where: "((local OR (uri IS NULL)) AND (deleted_at IS NULL) AND (visibility = 0) AND (reblog_of_id IS NULL) AND ((NOT reply) OR (in_reply_to_account_id = account_id)))"
     t.index ["id", "language", "account_id"], name: "index_statuses_public_20250129", order: { id: :desc }, where: "((deleted_at IS NULL) AND (visibility = 0) AND (reblog_of_id IS NULL) AND ((NOT reply) OR (in_reply_to_account_id = account_id)))"
+    t.index ["id"], name: "index_statuses_direct_by_id", order: :desc, where: "((visibility = 3) AND (deleted_at IS NULL))"
     t.index ["in_reply_to_account_id"], name: "index_statuses_on_in_reply_to_account_id", where: "(in_reply_to_account_id IS NOT NULL)"
     t.index ["in_reply_to_id"], name: "index_statuses_on_in_reply_to_id", where: "(in_reply_to_id IS NOT NULL)"
     t.index ["reblog_of_id", "account_id"], name: "index_statuses_on_reblog_of_id_and_account_id"
@@ -1380,10 +1440,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_10_000000) do
   add_foreign_key "canonical_email_blocks", "accounts", column: "reference_account_id", on_delete: :cascade
   add_foreign_key "conversation_mutes", "accounts", name: "fk_225b4212bb", on_delete: :cascade
   add_foreign_key "conversation_mutes", "conversations", on_delete: :cascade
+  add_foreign_key "conversations", "dm_rooms", on_delete: :nullify
   add_foreign_key "custom_filter_keywords", "custom_filters", on_delete: :cascade
   add_foreign_key "custom_filter_statuses", "custom_filters", on_delete: :cascade
   add_foreign_key "custom_filter_statuses", "statuses", on_delete: :cascade
   add_foreign_key "custom_filters", "accounts", on_delete: :cascade
+  add_foreign_key "dm_hidden_statuses", "accounts", on_delete: :cascade
+  add_foreign_key "dm_hidden_statuses", "statuses", on_delete: :cascade
+  add_foreign_key "dm_room_members", "accounts", on_delete: :cascade
+  add_foreign_key "dm_room_members", "dm_rooms", on_delete: :cascade
+  add_foreign_key "dm_room_nicknames", "accounts", column: "target_account_id", on_delete: :cascade
+  add_foreign_key "dm_room_nicknames", "accounts", on_delete: :cascade
+  add_foreign_key "dm_room_nicknames", "dm_rooms", on_delete: :cascade
+  add_foreign_key "dm_room_reads", "accounts", on_delete: :cascade
+  add_foreign_key "dm_room_reads", "dm_rooms", on_delete: :cascade
+  add_foreign_key "dm_room_reads", "statuses", column: "last_read_status_id", on_delete: :nullify
+  add_foreign_key "dm_rooms", "accounts", column: "creator_id", on_delete: :nullify
+  add_foreign_key "dm_rooms", "statuses", column: "last_status_id", on_delete: :nullify
+  add_foreign_key "dm_rooms", "statuses", column: "root_status_id", on_delete: :nullify
   add_foreign_key "email_domain_blocks", "email_domain_blocks", column: "parent_id", on_delete: :cascade
   add_foreign_key "fasp_backfill_requests", "fasp_providers"
   add_foreign_key "fasp_debug_callbacks", "fasp_providers"
