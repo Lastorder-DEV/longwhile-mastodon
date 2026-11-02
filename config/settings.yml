@@ -52,7 +52,7 @@ defaults: &defaults
   require_invite_text: false
   backups_retention_period: 7
   captcha_enabled: false
-  allow_referer_origin: false
+  allow_referrer_origin: false
   multi_account:
     client_id: <%= ENV.fetch('MA_MULTI_ACCOUNT_CLIENT_ID', '') %>
     client_secret: <%= ENV.fetch('MA_MULTI_ACCOUNT_CLIENT_SECRET', '') %>

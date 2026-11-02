@@ -3,6 +3,8 @@
 module JsonLdHelper
   include ContextHelper
 
+  UNSUPPORTED_JSONLD_KEYWORDS = %w(@graph @included @reverse).freeze
+
   def equals_or_includes?(haystack, needle)
     haystack.is_a?(Array) ? haystack.include?(needle) : haystack == needle
   end
@@ -26,6 +28,8 @@ module JsonLdHelper
   # The url attribute can be a string, an array of strings, or an array of objects.
   # The objects could include a mimeType. Not-included mimeType means it's text/html.
   def url_to_href(value, preferred_type = nil)
+    value = [value] if value.is_a?(Hash)
+
     single_value = if value.is_a?(Array) && !value.first.is_a?(String)
                      value.find { |link| preferred_type.nil? || ((link['mimeType'].presence || 'text/html') == preferred_type) }
                    elsif value.is_a?(Array)
@@ -39,6 +43,15 @@ module JsonLdHelper
     else
       single_value['href']
     end
+  end
+
+  def url_to_media_type(value, preferred_type = nil)
+    value = [value] if value.is_a?(Hash)
+    return unless value.is_a?(Array) && !value.first.is_a?(String)
+
+    single_value = value.find { |link| preferred_type.nil? || ((link['mimeType'].presence || 'text/html') == preferred_type) }
+
+    single_value['mediaType'] unless single_value.nil?
   end
 
   def as_array(value)
@@ -93,6 +106,40 @@ module JsonLdHelper
     compacted = JSON::LD::API.compact(json.without('signature'), full_context, documentLoader: method(:load_jsonld_context))
     compacted['signature'] = json['signature']
     compacted
+  end
+
+  # Checks for unsupported JSON-LD features or too many nodes
+  def check_jsonld_limits!(json, budget = 1_000)
+    budget -= 1
+
+    if json.is_a?(Hash)
+      json.each do |key, value|
+        raise Mastodon::InvalidJsonLdError, 'contains unsupported JSON-LD features' if UNSUPPORTED_JSONLD_KEYWORDS.include?(key)
+        raise Mastodon::InvalidJsonLdError, 'has too many nodes' if budget < 1
+
+        budget = check_jsonld_limits!(value, budget)
+      end
+    elsif json.is_a?(Array)
+      json.each do |value|
+        raise Mastodon::InvalidJsonLdError, 'has too many nodes' if budget < 1
+
+        budget = check_jsonld_limits!(value, budget)
+      end
+    end
+
+    raise Mastodon::InvalidJsonLdError, 'has too many nodes' if budget < 0 # rubocop:disable Style/NumericPredicate
+
+    budget
+  end
+
+  def unsupported_jsonld_features?(json)
+    if json.is_a?(Hash)
+      json.any? { |key, value| UNSUPPORTED_JSONLD_KEYWORDS.include?(key) || unsupported_jsonld_features?(value) }
+    elsif json.is_a?(Array)
+      json.any? { |value| unsupported_jsonld_features?(value) }
+    else
+      false
+    end
   end
 
   # Patches a JSON-LD document to avoid compatibility issues on redistribution
@@ -169,19 +216,19 @@ module JsonLdHelper
 
   # Fetch the resource given by uri.
   # @param uri [String]
-  # @param id_is_known [Boolean]
+  # @param allow_redirects [Boolean]
   # @param on_behalf_of [nil, Account]
   # @param raise_on_error [Symbol<:all, :temporary, :none>] See {#fetch_resource_without_id_validation} for possible values
-  def fetch_resource(uri, id_is_known, on_behalf_of = nil, raise_on_error: :none, request_options: {})
-    unless id_is_known
-      json = fetch_resource_without_id_validation(uri, on_behalf_of, raise_on_error: raise_on_error)
+  def fetch_resource(uri, allow_redirects: false, on_behalf_of: nil, raise_on_error: :none, request_options: {})
+    if allow_redirects
+      json = fetch_resource_without_id_validation(uri, on_behalf_of: on_behalf_of, raise_on_error: raise_on_error)
 
       return if !json.is_a?(Hash) || unsupported_uri_scheme?(json['id'])
 
       uri = json['id']
     end
 
-    json = fetch_resource_without_id_validation(uri, on_behalf_of, raise_on_error: raise_on_error, request_options: request_options)
+    json = fetch_resource_without_id_validation(uri, allow_redirects: false, on_behalf_of: on_behalf_of, raise_on_error: raise_on_error, request_options: request_options)
     json.present? && json['id'] == uri ? json : nil
   end
 
@@ -190,20 +237,23 @@ module JsonLdHelper
   # If an error is raised, it contains the response and can be captured for handling like
   #
   #     begin
-  #       fetch_resource_without_id_validation(uri, nil, true)
+  #       fetch_resource_without_id_validation(uri, raise_on_error: all)
   #     rescue Mastodon::UnexpectedResponseError => e
   #       e.response
   #     end
   #
   # @param uri [String]
   # @param on_behalf_of [nil, Account]
+  # @param allow_redirects [Boolean]
   # @param raise_on_error [Symbol<:all, :temporary, :none>]
   #   - +:all+ - raise if response code is not in the 2xx range
   #   - +:temporary+ - raise if the response code is not an "unsalvageable error" like a 404
   #     (see {#response_error_unsalvageable} )
   #   - +:none+ - do not raise, return +nil+
-  def fetch_resource_without_id_validation(uri, on_behalf_of = nil, raise_on_error: :none, request_options: {})
+  def fetch_resource_without_id_validation(uri, allow_redirects: true, on_behalf_of: nil, raise_on_error: :none, request_options: {})
     on_behalf_of ||= Account.representative
+
+    request_options = request_options.merge(follow: false) unless allow_redirects
 
     build_request(uri, on_behalf_of, options: request_options).perform do |response|
       raise Mastodon::UnexpectedResponseError, response if !response_successful?(response) && (
@@ -211,7 +261,7 @@ module JsonLdHelper
         (!response_error_unsalvageable?(response) && raise_on_error == :temporary)
       )
 
-      body_to_json(response.body_with_limit) if response.code == 200 && valid_activitypub_content_type?(response)
+      body_to_json(response.body_with_limit) if response.code == 200 && valid_activitypub_content_type?(response) && (allow_redirects || response.uri.to_s == uri)
     end
   end
 

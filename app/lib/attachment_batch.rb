@@ -136,10 +136,9 @@ class AttachmentBatch
     @bucket ||= records.first.public_send(@attachment_names.first).s3_bucket
   end
 
-  # The aws-sdk-s3 gem does not offer a way to cleanly override the timeout
-  # on a per-request basis, so we temporarily change the client's config and
-  # restore it afterwards. Large batch deletes can be slow, so we raise the
-  # read timeout for the duration of the call (#37004).
+  # Currently, the aws-sdk-s3 gem does not offer a way to cleanly override the timeout
+  # per-request. So we change the client's config instead. As this client will likely
+  # be re-used for other jobs, restore its original configuration in an `ensure` block.
   def with_overridden_timeout(s3_client, longer_read_timeout)
     original_timeout = s3_client.config.http_read_timeout
     s3_client.config.http_read_timeout = [original_timeout, longer_read_timeout].max

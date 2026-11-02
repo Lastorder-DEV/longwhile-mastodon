@@ -102,10 +102,10 @@ KoPub 돋움 ttf 적용으로 Windows PC 웹에서도 눈이 피로하지 않은
 
 ### 요구 사항 (Requirements)
 
+- **PostgreSQL** 13+
+- **Redis** 6.2+
 - **Ruby** 3.2+
-- **PostgreSQL** 12+
-- **Redis** 4.0+
-- **Node.js** 18+
+- **Node.js** 20+
 
 이 저장소에는 **Docker 및 docker-compose**를 위한 배포 설정뿐만 아니라 Heroku, Scalingo와 같은 다른 환경을 위한 설정도 포함되어 있습니다. Helm 차트의 경우 [mastodon/chart 저장소](https://github.com/mastodon/chart)를 참조하세요. [**독립형(Standalone)** 설치 가이드](https://docs.joinmastodon.org/admin/install/)는 메인 문서에서 확인할 수 있습니다.
 

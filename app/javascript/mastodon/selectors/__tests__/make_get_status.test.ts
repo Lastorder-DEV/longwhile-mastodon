@@ -2,6 +2,8 @@ import { Map as ImmutableMap, fromJS } from 'immutable';
 
 import { makeGetStatus } from '..';
 
+type GetStatus = (state: unknown, props: { id: string }) => unknown;
+
 const stateWith = (accounts: Record<string, unknown>) =>
   ImmutableMap({
     statuses: fromJS({ '1': { id: '1', account: '10', reblog: null } }),
@@ -11,13 +13,13 @@ const stateWith = (accounts: Record<string, unknown>) =>
 
 describe('makeGetStatus', () => {
   it('returns null instead of crashing when the author is missing', () => {
-    const getStatus = makeGetStatus();
+    const getStatus = makeGetStatus() as unknown as GetStatus;
 
     expect(getStatus(stateWith({}), { id: '1' })).toBeNull();
   });
 
   it('still returns the status when the author is loaded', () => {
-    const getStatus = makeGetStatus();
+    const getStatus = makeGetStatus() as unknown as GetStatus;
     const status = getStatus(stateWith({ '10': { id: '10' } }), {
       id: '1',
     }) as ImmutableMap<string, unknown> | null;

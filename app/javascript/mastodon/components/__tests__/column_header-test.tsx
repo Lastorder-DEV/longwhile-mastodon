@@ -4,7 +4,7 @@ import { changeLayout } from 'mastodon/actions/app';
 import { importAccounts } from 'mastodon/actions/importer/accounts';
 import type { ApiAccountJSON } from 'mastodon/api_types/accounts';
 import { store } from 'mastodon/store';
-import { render, screen } from 'mastodon/test_helpers';
+import { render, screen } from '@/testing/rendering';
 
 import { ColumnHeader } from '../column_header';
 

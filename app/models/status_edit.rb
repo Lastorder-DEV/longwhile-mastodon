@@ -32,7 +32,7 @@ class StatusEdit < ApplicationRecord
              :preview_remote_url, :text_url, :meta, :blurhash,
              :not_processed?, :needs_redownload?, :local?,
              :file, :thumbnail, :thumbnail_remote_url,
-             :shortcode, :video?, :audio?, to: :media_attachment
+             :shortcode, :video?, :audio?, :discarded?, to: :media_attachment
   end
 
   rate_limit by: :account, family: :statuses
@@ -43,7 +43,28 @@ class StatusEdit < ApplicationRecord
   scope :ordered, -> { order(id: :asc) }
 
   delegate :local?, :application, :edited?, :edited_at,
-           :discarded?, :visibility, :language, to: :status
+           :discarded?, :reply?, :visibility, :language, to: :status
+
+  def with_media?
+    ordered_media_attachments.any?
+  end
+
+  def with_poll?
+    poll_options.present?
+  end
+
+  def poll
+    return @poll if defined?(@poll)
+    return @poll = nil if poll_options.blank?
+
+    @poll = Poll.new({
+      options: poll_options,
+      account_id: account_id,
+      status_id: status_id,
+    })
+  end
+
+  alias preloadable_poll poll
 
   def with_poll?
     poll_options.present?

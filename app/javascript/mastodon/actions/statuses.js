@@ -3,7 +3,7 @@ import { browserHistory } from 'mastodon/components/router';
 import api from '../api';
 
 import { ensureComposeIsVisible, setComposeToStatus } from './compose';
-import { importFetchedStatus, importFetchedStatuses, importFetchedAccount } from './importer';
+import { importFetchedStatus, importFetchedAccount } from './importer';
 import { changeSetting } from './settings';
 import { fetchContext } from './statuses_typed';
 import { deleteFromTimelines } from './timelines';
@@ -49,7 +49,18 @@ export function fetchStatusRequest(id, skipLoading) {
   };
 }
 
-export function fetchStatus(id, forceFetch = false, alsoFetchContext = true) {
+/**
+ * @param {string} id
+ * @param {Object} [options]
+ * @param {boolean} [options.forceFetch]
+ * @param {boolean} [options.alsoFetchContext]
+ * @param {string | null | undefined} [options.parentQuotePostId]
+ */
+export function fetchStatus(id, {
+  forceFetch = false,
+  alsoFetchContext = true,
+  parentQuotePostId,
+} = {}) {
   return (dispatch, getState) => {
     const skipLoading = !forceFetch && getState().getIn(['statuses', id], null) !== null;
 
@@ -67,7 +78,9 @@ export function fetchStatus(id, forceFetch = false, alsoFetchContext = true) {
       dispatch(importFetchedStatus(response.data));
       dispatch(fetchStatusSuccess(skipLoading));
     }).catch(error => {
-      dispatch(fetchStatusFail(id, error, skipLoading));
+      dispatch(fetchStatusFail(id, error, skipLoading, parentQuotePostId));
+      if (error.status === 404)
+        dispatch(deleteFromTimelines(id));
     });
   };
 }
@@ -79,11 +92,12 @@ export function fetchStatusSuccess(skipLoading) {
   };
 }
 
-export function fetchStatusFail(id, error, skipLoading) {
+export function fetchStatusFail(id, error, skipLoading, parentQuotePostId) {
   return {
     type: STATUS_FETCH_FAIL,
     id,
     error,
+    parentQuotePostId,
     skipLoading,
     skipAlert: true,
   };

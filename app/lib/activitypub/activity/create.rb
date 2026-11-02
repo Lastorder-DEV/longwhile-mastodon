@@ -14,15 +14,29 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   private
 
   def create_status
-    return reject_payload! if unsupported_object_type? || non_matching_uri_hosts?(@account.uri, object_uri) || tombstone_exists? || !related_to_local_activity?
+    return reject_payload! if unsupported_object_type? || non_matching_uri_hosts?(@account.uri, object_uri) || tombstone_exists?
+
+    @status_parser = ActivityPub::Parser::StatusParser.new(
+      @json,
+      followers_collection: @account.followers_url,
+      actor_uri: ActivityPub::TagManager.instance.uri_for(@account),
+      object: @object
+    )
+
+    return reject_payload! unless related_to_local_activity?
 
     with_redis_lock("create:#{object_uri}") do
-      return if delete_arrived_first?(object_uri) || poll_vote?
+      Status.uncached do
+        return if delete_arrived_first?(object_uri) || poll_vote?
 
-      @status = find_existing_status
+        @status = find_existing_status
+      end
 
       if @status.nil?
         process_status
+      elsif @status.account_id != @account.id
+        Rails.logger.debug { "Not processing #{object_uri}: authorship change is not supported" }
+        return reject_payload!
       elsif @options[:delivered_to_account_id].present?
         postprocess_audience_and_deliver
       end
@@ -31,13 +45,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     @status
   end
 
-  def audience_to
-    as_array(@object['to'] || @json['to']).map { |x| value_or_id(x) }
-  end
-
-  def audience_cc
-    as_array(@object['cc'] || @json['cc']).map { |x| value_or_id(x) }
-  end
+  delegate :audience_to, :audience_cc, to: :@status_parser
 
   def process_status
     @tags                 = []
@@ -47,6 +55,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     @params               = {}
     @quote                = nil
     @quote_uri            = nil
+    @quote_approval_uri   = nil
 
     process_status_params
     process_tags
@@ -54,16 +63,16 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     process_audience
 
     ApplicationRecord.transaction do
-      @status = Status.create!(@params)
+      @status = Status.create!(@params.merge(quote: @quote))
       attach_tags(@status)
       attach_mentions(@status)
       attach_counts(@status)
-      attach_quote(@status)
     end
 
     resolve_thread(@status)
     resolve_unresolved_mentions(@status)
     fetch_replies(@status)
+    fetch_and_verify_quote
     distribute
     forward_for_reply
   end
@@ -79,17 +88,10 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def find_existing_status
     status   = status_from_uri(object_uri)
     status ||= Status.find_by(uri: @object['atomUri']) if @object['atomUri'].present?
-    status if status&.account_id == @account.id
+    status
   end
 
   def process_status_params
-    @status_parser = ActivityPub::Parser::StatusParser.new(
-      @json,
-      followers_collection: @account.followers_url,
-      actor_uri: ActivityPub::TagManager.instance.uri_for(@account),
-      object: @object
-    )
-
     attachment_ids = process_attachments.take(Status::MEDIA_ATTACHMENTS_LIMIT).map(&:id)
 
     @params = {
@@ -199,18 +201,6 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     end
   end
 
-  def attach_quote(status)
-    return if @quote.nil?
-
-    @quote.status = status
-    @quote.save
-
-    embedded_quote = safe_prefetched_embed(@account, @status_parser.quoted_object, @json['context'])
-    ActivityPub::VerifyQuoteService.new.call(@quote, fetchable_quoted_uri: @quote_uri, prefetched_quoted_object: embedded_quote, request_id: @options[:request_id])
-  rescue Mastodon::UnexpectedResponseError, *Mastodon::HTTP_CONNECTION_ERRORS
-    ActivityPub::RefetchAndVerifyQuoteWorker.perform_in(rand(30..600).seconds, @quote.id, @quote_uri, { 'request_id' => @options[:request_id] })
-  end
-
   def process_tags
     return if @object['tag'].nil?
 
@@ -226,14 +216,12 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def process_quote
-    return unless Mastodon::Feature.inbound_quotes_enabled?
-
     @quote_uri = @status_parser.quote_uri
-    return if @quote_uri.blank?
+    return unless @status_parser.quote?
 
-    approval_uri = @status_parser.quote_approval_uri
-    approval_uri = nil if unsupported_uri_scheme?(approval_uri)
-    @quote = Quote.new(account: @account, approval_uri: approval_uri)
+    @quote_approval_uri = @status_parser.quote_approval_uri
+    @quote_approval_uri = nil if unsupported_uri_scheme?(@quote_approval_uri) || TagManager.instance.local_url?(@quote_approval_uri)
+    @quote = Quote.new(account: @account, approval_uri: nil, legacy: @status_parser.legacy_quote?, state: @status_parser.deleted_quote? ? :deleted : :pending)
   end
 
   def process_hashtag(tag)
@@ -380,6 +368,15 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     Rails.logger.warn "Error fetching replies: #{e}"
   end
 
+  def fetch_and_verify_quote
+    return if @quote.nil?
+
+    embedded_quote = safe_prefetched_embed(@account, @status_parser.quoted_object, @json['@context'])
+    ActivityPub::VerifyQuoteService.new.call(@quote, @quote_approval_uri, fetchable_quoted_uri: @quote_uri, prefetched_quoted_object: embedded_quote, request_id: @options[:request_id], depth: @options[:depth])
+  rescue Mastodon::RecursionLimitExceededError, Mastodon::UnexpectedResponseError, *Mastodon::HTTP_CONNECTION_ERRORS
+    ActivityPub::RefetchAndVerifyQuoteWorker.perform_in(rand(30..600).seconds, @quote.id, @quote_uri, { 'request_id' => @options[:request_id], 'approval_uri' => @quote_approval_uri })
+  end
+
   def conversation_from_uri(uri)
     return nil if uri.nil?
     return Conversation.find_by(id: OStatus::TagManager.instance.unique_tag_to_local_id(uri, 'Conversation')) if OStatus::TagManager.instance.local_id?(uri)
@@ -434,8 +431,16 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   end
 
   def related_to_local_activity?
-    fetch? || followed_by_local_accounts? || requested_through_relay? ||
-      responds_to_followed_account? || addresses_local_accounts?
+    return true if fetch?
+
+    case @status_parser.visibility
+    when :public, :unlisted
+      followed_by_local_accounts? || requested_through_relay? || responds_to_followed_account? || addresses_local_accounts?
+    when :private
+      followed_by_local_accounts? || addresses_local_accounts?
+    when :direct
+      addresses_local_accounts?
+    end
   end
 
   def responds_to_followed_account?

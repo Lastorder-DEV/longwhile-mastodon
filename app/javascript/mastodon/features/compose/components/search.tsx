@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 
 import {
   defineMessages,
@@ -47,9 +47,6 @@ const labelForRecentSearch = (search: RecentSearch) => {
   }
 };
 
-const unfocus = () => {
-  document.querySelector('.ui')?.parentElement?.focus();
-};
 
 interface SearchOption {
   key: string;
@@ -73,7 +70,16 @@ export const Search: React.FC<{
   const [expanded, setExpanded] = useState(false);
   const [selectedOption, setSelectedOption] = useState(-1);
   const [quickActions, setQuickActions] = useState<SearchOption[]>([]);
+  useEffect(() => {
+    setValue(initialValue ?? '');
+    setQuickActions([]);
+  }, [initialValue]);
   const searchOptions: SearchOption[] = [];
+
+  const unfocus = useCallback(() => {
+    document.querySelector('.ui')?.parentElement?.focus();
+    setExpanded(false);
+  }, []);
 
   if (searchEnabled) {
     searchOptions.push(
@@ -222,7 +228,7 @@ export const Search: React.FC<{
     },
     forget: (e) => {
       e.stopPropagation();
-      void dispatch(forgetSearchResult(search.q));
+      void dispatch(forgetSearchResult(search));
     },
   }));
 
@@ -250,7 +256,7 @@ export const Search: React.FC<{
       history.push({ pathname: '/search', search: queryParams.toString() });
       unfocus();
     },
-    [dispatch, history],
+    [dispatch, history, unfocus],
   );
 
   const handleChange = useCallback(
@@ -370,14 +376,15 @@ export const Search: React.FC<{
 
       setQuickActions(newQuickActions);
     },
-    [dispatch, history, signedIn, setValue, setQuickActions, submit],
+    [signedIn, dispatch, unfocus, history, submit],
   );
 
   const handleClear = useCallback(() => {
     setValue('');
     setQuickActions([]);
     setSelectedOption(-1);
-  }, [setValue, setQuickActions, setSelectedOption]);
+    unfocus();
+  }, [unfocus]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -428,7 +435,7 @@ export const Search: React.FC<{
           break;
       }
     },
-    [navigableOptions, value, selectedOption, setSelectedOption, submit],
+    [unfocus, navigableOptions, selectedOption, submit, value],
   );
 
   const handleFocus = useCallback(() => {
@@ -448,12 +455,38 @@ export const Search: React.FC<{
   }, [setExpanded, setSelectedOption, singleColumn]);
 
   const handleBlur = useCallback(() => {
-    setExpanded(false);
     setSelectedOption(-1);
-  }, [setExpanded, setSelectedOption]);
+  }, [setSelectedOption]);
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    // If the search popover is expanded, close it when tabbing or
+    // clicking outside of it or the search form, while allowing
+    // tabbing or clicking inside of the popover
+    if (expanded) {
+      function closeOnLeave(event: FocusEvent | MouseEvent) {
+        const form = formRef.current;
+        const isClickInsideForm =
+          form &&
+          (form === event.target || form.contains(event.target as Node));
+        if (!isClickInsideForm) {
+          setExpanded(false);
+        }
+      }
+      document.addEventListener('focusin', closeOnLeave);
+      document.addEventListener('click', closeOnLeave);
+
+      return () => {
+        document.removeEventListener('focusin', closeOnLeave);
+        document.removeEventListener('click', closeOnLeave);
+      };
+    }
+    return () => null;
+  }, [expanded]);
 
   return (
-    <form className={classNames('search', { active: expanded })}>
+    <form ref={formRef} className={classNames('search', { active: expanded })}>
       <span className='search__icon' aria-hidden='true'>
         <Icon id='search' icon={SearchIcon} />
       </span>
@@ -486,7 +519,7 @@ export const Search: React.FC<{
         </button>
       )}
 
-      <div className='search__popout'>
+      <div className='search__popout' tabIndex={-1}>
         {!hasValue && (
           <>
             <h4>
@@ -499,8 +532,10 @@ export const Search: React.FC<{
             <div className='search__popout__menu'>
               {recentOptions.length > 0 ? (
                 recentOptions.map(({ label, key, action, forget }, i) => (
-                  <button
+                  <div
                     key={key}
+                    tabIndex={0}
+                    role='button'
                     onMouseDown={action}
                     className={classNames(
                       'search__popout__menu__item search__popout__menu__item--flex',
@@ -511,7 +546,7 @@ export const Search: React.FC<{
                     <button className='icon-button' onMouseDown={forget}>
                       <Icon id='times' icon={CloseIcon} />
                     </button>
-                  </button>
+                  </div>
                 ))
               ) : (
                 <div className='search__popout__menu__message'>

@@ -93,7 +93,7 @@ const RecipientRow: React.FC<{
               id='lock'
               icon={LockIcon}
               className='dm-recipient__row__lock'
-              title={intl.formatMessage(messages.locked)}
+              aria-label={intl.formatMessage(messages.locked)}
             />
           )}
         </span>

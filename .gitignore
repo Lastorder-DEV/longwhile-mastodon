@@ -80,3 +80,6 @@ docker-compose.override.yml
 
 # Ignore local-only rspec configuration
 .rspec-local
+
+*storybook.log
+storybook-static

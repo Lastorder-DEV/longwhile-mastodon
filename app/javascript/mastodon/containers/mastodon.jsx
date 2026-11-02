@@ -21,6 +21,7 @@ import { isProduction } from 'mastodon/utils/environment';
 import { remembersOwnScroll } from 'mastodon/utils/scroll_anchor';
 import { setActiveAccountToken } from 'mastodon/api';
 import { hydrateStore as hydrateMultiAccountStore } from 'mastodon/utils/multi_account_storage';
+import { BodyScrollLock } from 'mastodon/features/ui/components/body_scroll_lock';
 
 const title = isProduction() ? siteTitle : `${siteTitle} (Dev)`;
 
@@ -103,6 +104,7 @@ export default class Mastodon extends PureComponent {
                 <ScrollContext shouldUpdateScroll={this.shouldUpdateScroll}>
                   <Route path='/' component={UI} />
                 </ScrollContext>
+                <BodyScrollLock />
               </Router>
 
               <Helmet defaultTitle={title} titleTemplate={`%s - ${title}`} />

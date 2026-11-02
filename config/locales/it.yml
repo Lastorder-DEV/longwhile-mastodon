@@ -8,8 +8,8 @@ it:
     title: Info
   accounts:
     followers:
-      one: Seguace
-      other: Seguaci
+      one: Follower
+      other: Follower
     following: Seguiti
     instance_actor_flash: Questo profilo è un attore virtuale, utilizzato per rappresentare il server stesso e non un singolo utente. È utilizzato per scopi federativi e non dovrebbe esser sospeso.
     last_active: ultima attività
@@ -73,14 +73,14 @@ it:
       enable_sign_in_token_auth: Abilitare l'autenticazione del token e-mail
       enabled: Abilitato
       enabled_msg: Il profilo di %{username} è stato scongelato correttamente
-      followers: Seguaci
+      followers: Follower
       follows: Seguiti
       header: Intestazione
       inbox_url: URL casella
       invite_request_text: Motivi d'iscrizione
       invited_by: Invitato da
       ip: IP
-      joined: Iscritto il
+      joined: Account iscritto il
       location:
         all: Tutto
         local: Locale
@@ -191,6 +191,7 @@ it:
         create_unavailable_domain: Crea Dominio Non Disponibile
         create_user_role: Crea Ruolo
         demote_user: Retrocedi Utente
+        destroy_account: Elimina i dati dell'account
         destroy_announcement: Elimina Annuncio
         destroy_canonical_email_block: Elimina il blocco dell'e-mail
         destroy_custom_emoji: Elimina Emoji Personalizzata
@@ -256,6 +257,7 @@ it:
         create_unavailable_domain_html: "%{name} ha interrotto la consegna al dominio %{target}"
         create_user_role_html: "%{name} ha creato il ruolo %{target}"
         demote_user_html: "%{name} ha retrocesso l'utente %{target}"
+        destroy_account_html: "%{name} ha eliminato i dati dell'account per %{target}"
         destroy_announcement_html: "%{name} ha eliminato l'annuncio %{target}"
         destroy_canonical_email_block_html: "%{name} ha sbloccato l'e-mail con l'hash %{target}"
         destroy_custom_emoji_html: "%{name} ha eliminato l'emoji %{target}"
@@ -511,7 +513,7 @@ it:
         title: Fornitori di Servizi Ausiliari per il Fediverso
       title: FASP
     follow_recommendations:
-      description_html: "<strong>I consigli su chi seguire aiutano i nuovi utenti a trovare rapidamente dei contenuti interessanti</strong>. Quando un utente non ha interagito abbastanza con altri per avere dei consigli personalizzati, vengono consigliati questi account. Sono ricalcolati ogni giorno da un misto di account con le più alte interazioni recenti e con il maggior numero di seguaci locali per una data lingua."
+      description_html: "<strong>I consigli su chi seguire aiutano i nuovi utenti a trovare rapidamente dei contenuti interessanti</strong>. Quando un utente non ha interagito abbastanza con altri per avere dei consigli personalizzati, vengono consigliati questi account. Sono ricalcolati ogni giorno da un misto di account con le più alte interazioni recenti e con il maggior numero di follower locali per una data lingua."
       language: Per lingua
       status: Stato
       suppress: Nascondi consigli su chi seguire
@@ -553,8 +555,8 @@ it:
       dashboard:
         instance_accounts_dimension: Profili più seguiti
         instance_accounts_measure: profili memorizzati
-        instance_followers_measure: i nostri seguaci lì
-        instance_follows_measure: i loro seguaci qui
+        instance_followers_measure: i nostri follower lì
+        instance_follows_measure: i loro follower qui
         instance_languages_dimension: Lingue preferite
         instance_media_attachments_measure: allegati multimediali memorizzati
         instance_reports_measure: segnalazioni su di loro
@@ -578,6 +580,13 @@ it:
         all: Tutto
         limited: Limitato
         title: Moderazione
+      moderation_notes:
+        create: Aggiungi Nota di Moderazione
+        created_msg: Nota di moderazione dell'istanza creata con successo!
+        description_html: Visualizza e lascia note per altri moderatori e per il futuro te
+        destroyed_msg: Nota di moderazione dell'istanza eliminata con successo!
+        placeholder: Informazioni su questa istanza, azioni compiute, o qualsiasi cosa possa aiutarti a moderare questa istanza in futuro.
+        title: Note di Moderazione
       private_comment: Commento privato
       public_comment: Commento pubblico
       purge: Ripulisci
@@ -646,12 +655,12 @@ it:
         mark_as_sensitive_description_html: I contenuti nei post segnalati saranno segnati come sensibili e verrà registrata una sanzione per aiutarti a prendere ulteriori provvedimenti sulle future infrazioni dello stesso account.
         other_description_html: Vedi altre opzioni per controllare il comportamento dell'account e personalizzare la comunicazione all'account segnalato.
         resolve_description_html: Nessuna azione sarà intrapresa contro l'account segnalato, nessuna sanzione registrata, e la segnalazione sarà chiusa.
-        silence_description_html: L'account sarà visibile solo a coloro che lo seguono o lo cercano manualmente, limitandone fortemente la raggiungibilità. Può sempre essere annullato. Chiude tutte le segnalazioni contro questo account.
+        silence_description_html: L'account sarà visibile solo a coloro che già lo seguono o lo cercano manualmente, limitandone fortemente la sua visibilità. Può sempre essere annullato. Chiude tutte le segnalazioni contro questo account.
         suspend_description_html: L'account e tutti i suoi contenuti saranno inaccessibili ed eventualmente cancellati, e interagire con esso sarà impossibile. Reversibile entro 30 giorni. Chiude tutte le segnalazioni contro questo account.
       actions_description_html: Decidi quale azione intraprendere per risolvere questa segnalazione. Se intraprendi un'azione punitiva nei confronti dell'account segnalato, gli verrà inviata una notifica via e-mail, tranne quando è selezionata la categoria <strong>Spam</strong>.
       actions_description_remote_html: Decide quali azioni intraprendere per risolvere la relazione. Questo influenzerà solo come <strong>il tuo</strong> server comunica con questo account remoto e ne gestisce il contenuto.
       actions_no_posts: Questa segnalazione non ha alcun post associato da eliminare
-      add_to_report: Aggiungi altro al report
+      add_to_report: Aggiungi altro alla segnalazione
       already_suspended_badges:
         local: Già sospeso su questo server
         remote: Già sospeso sul loro server
@@ -707,7 +716,7 @@ it:
         actions:
           delete_html: Rimuovi i post offensivi
           mark_as_sensitive_html: Contrassegna i file multimediali dei post offensivi come sensibili
-          silence_html: Limita severamente la portata di <strong>@%{acct}</strong> rendendo il suo profilo e il suo contenuto visibili solo a persone che già li seguono o che lo guardano manualmente
+          silence_html: Limita fortemente la visibilità di <strong>@%{acct}</strong> rendendo il suo profilo e i suoi contenuti visibili solo alle persone che già lo seguono o che cercano manualmente il suo profilo
           suspend_html: Sospendere <strong>@%{acct}</strong>, rendendo il suo profilo e i suoi contenuti inaccessibili e impossibilitandone l'interazione
         close_report: 'Contrassegna la segnalazione #%{id} come risolta'
         close_reports_html: Contrassegna <strong>tutte</strong> le segnalazioni contro <strong>@%{acct}</strong> come risolte
@@ -786,17 +795,26 @@ it:
       title: Ruoli
     rules:
       add_new: Aggiungi regola
+      add_translation: Aggiungi traduzione
       delete: Cancella
       description_html: Mentre la maggior parte degli utenti sostiene di aver letto e accettato i termini di servizio, di solito non li leggono fino a quando sorge un problema. <strong>Rendi più facile vedere le regole del server, fornendole in un semplice elenco</strong>. Cerca di mantenere le singole regole brevi e semplici, ma cerca anche di non dividerle in molti elementi separati.
       edit: Modifica regola
       empty: Non sono ancora state definite regole del server.
+      move_down: Sposta giu
+      move_up: Muovi su
       title: Regole del server
+      translation: Traduzione
+      translations: Traduzioni
+      translations_explanation: Puoi opzionalmente aggiungere delle traduzioni per le regole. Il valore predefinito verrà mostrato se non è disponibile nessuna versione tradotta. Assicurarsi sempre che qualsiasi traduzione fornita sia sincronizzata con il valore predefinito.
     settings:
       about:
         manage_rules: Gestisci le regole del server
         preamble: Fornire informazioni approfondite su come, il server, venga gestito, moderato e finanziato.
         rules_hint: C'è un'area dedicata per le regole che i tuoi utenti dovrebbero rispettare.
         title: Info
+      allow_referrer_origin:
+        desc: Quando i tuoi utenti cliccano su link a siti esterni, il loro browser potrebbe inviare l'indirizzo del tuo server Mastodon come referente. Disattiva questa opzione se ciò identificherebbe in modo univoco i tuoi utenti, per esempio, se si tratta di un server Mastodon personale.
+        title: Consenti ai siti esterni di vedere il tuo server Mastodon come fonte di traffico
       appearance:
         preamble: Personalizza l'interfaccia web di Mastodon.
         title: Aspetto
@@ -816,9 +834,9 @@ it:
       discovery:
         follow_recommendations: Segui le raccomandazioni
         preamble: La comparsa di contenuti interessanti è determinante per l'arrivo di nuovi utenti che potrebbero non conoscere nessuno su Mastodon. Controlla in che modo varie funzionalità di scoperta funzionano sul tuo server.
+        privacy: Privacy
         profile_directory: Directory del profilo
         public_timelines: Timeline pubbliche
-        publish_discovered_servers: Pubblica i server scoperti
         publish_statistics: Pubblica le statistiche
         title: Scopri
         trends: Tendenze
@@ -838,7 +856,7 @@ it:
         warning_hint: Ti consigliamo di utilizzare “Approvazione richiesta per la registrazione” a meno che tu non sia sicuro che il tuo team di moderazione possa gestire lo spam e le registrazioni dannose in modo tempestivo.
       security:
         authorized_fetch: Richiede l'autenticazione dai server federati
-        authorized_fetch_hint: La richiesta di autenticazione da server federati consente un'applicazione più rigorosa dei blocchi sia a livello di utente che a livello di server. Tuttavia, ciò comporta una riduzione delle prestazioni, riduce la portata delle tue risposte e potrebbe introdurre problemi di compatibilità con alcuni servizi federati. Inoltre, ciò non impedirà agli attori dedicati di recuperare i tuoi post pubblici e account.
+        authorized_fetch_hint: Richiedere l'autenticazione da server federati consente un'applicazione più rigorosa dei blocchi sia a livello utente che a livello server. Tuttavia, ciò comporta un calo delle prestazioni, riduce la visibilità delle tue risposte e potrebbe causare problemi di compatibilità con alcuni servizi federati. Inoltre, questo non impedirà ad attori dedicati di accedere ai tuoi post e account pubblici.
         authorized_fetch_overridden_hint: Al momento non puoi modificare questa impostazione perché è sostituita da una variabile di ambiente.
         federation_authentication: Applicazione dell'autenticazione della federazione
       title: Impostazioni del server
@@ -861,7 +879,7 @@ it:
       account: Autore
       application: Applicazione
       back_to_account: Torna alla pagina dell'account
-      back_to_report: Torna alla pagina del report
+      back_to_report: Torna alla pagina di segnalazione
       batch:
         add_to_report: 'Aggiungi alla segnalazione #%{id}'
         remove_from_report: Rimuovi dal report
@@ -1138,7 +1156,7 @@ it:
     created_msg: Hai creato un nuovo alias. Ora puoi iniziare lo spostamento dal vecchio account.
     deleted_msg: L'alias è stato eliminato. Lo spostamento da quell'account a questo non sarà più possibile.
     empty: Non hai alias.
-    hint_html: Se vuoi trasferirti da un altro account a questo, qui puoi creare un alias, che è necessario prima di poter spostare i seguaci dal vecchio account a questo. Questa azione è <strong>innocua e reversibile</strong>. <strong>La migrazione dell'account è avviata dal vecchio account</strong>.
+    hint_html: Se vuoi trasferirti da un altro account a questo, qui puoi creare un alias, che è necessario prima di poter spostare i follower dal vecchio account a questo. Questa azione è <strong>innocua e reversibile</strong>. <strong>La migrazione dell'account è avviata dal vecchio account</strong>.
     remove: Scollega alias
   appearance:
     animations_and_accessibility: Animazioni e accessibilità
@@ -1283,9 +1301,11 @@ it:
   deletes:
     challenge_not_passed: Le informazioni che hai inserito non sono corrette
     confirm_password: Inserisci la tua password attuale per verificare la tua identità
-    confirm_username: Inserisci il tuo nome utente per confermare la procedura
+    confirm_username: Conferma il nome utente
+    confirm_username_hint_html: Per favore digita <code>%{username}</code> per confermare l'account che vuoi eliminare
     proceed: Cancella l'account
     success_msg: Il tuo account è stato cancellato
+    title: Elimina l'account %{acct}
     warning:
       before: 'Prima di procedere, per favore leggi attentamente queste note:'
       caches: Il contenuto che è stato memorizzato in cache da altri server può continuare ad esistere
@@ -1294,7 +1314,7 @@ it:
       email_contact_html: Se ancora non arriva, puoi inviare un'e-mail a <a href="mailto:%{email}">%{email}</a> per assistenza
       email_reconfirmation_html: Se non ricevi l'e-mail di conferma, puoi <a href="%{path}">richiederla nuovamente</a>
       irreversible: Non potrai ripristinare o riattivare il tuo account
-      more_details_html: Per maggiori dettagli, vedi la <a href="%{terms_path}">politica di privacy</a>.
+      more_details_html: Per maggiori dettagli, vedi l'<a href="%{terms_path}">informativa sulla privacy</a>.
       username_available: Il tuo nome utente sarà nuovamente disponibile
       username_unavailable: Il tuo nome utente rimarrà non disponibile
   disputes:
@@ -1578,7 +1598,7 @@ it:
   migrations:
     acct: utente@dominio del nuovo account
     cancel: Annulla ridirezione
-    cancel_explanation: Se annulli il reindirizzamento sarà riattivato il tuo account attuale, ma i seguaci che sono stati spostati all'altro account non saranno riportati indietro.
+    cancel_explanation: Se annulli il reindirizzamento sarà riattivato il tuo account attuale, ma i follower che sono stati spostati all'altro account non saranno riportati indietro.
     cancelled_msg: Reindirizzamento annullato.
     errors:
       already_moved: è lo stesso account su cui ti sei già trasferito
@@ -1586,14 +1606,14 @@ it:
       move_to_self: non può essere l'account attuale
       not_found: non trovato
       on_cooldown: Ti trovi nel periodo di pausa tra un trasferimento e l'altro
-    followers_count: Seguaci al momento dello spostamento
+    followers_count: Follower al momento dello spostamento
     incoming_migrations: In arrivo da un altro account
     incoming_migrations_html: Per spostarti da un altro account a questo, devi prima creare <a href="%{path}">un alias</a>.
     moved_msg: Il tuo account è ora reindirizzato a %{acct} e i tuoi follower sono stati spostati.
     not_redirecting: Il tuo account attualmente non è reindirizzato ad alcun altro account.
     on_cooldown: Hai recentemente trasferito il tuo account. Questa funzione sarà nuovamente disponibile tra %{count} giorni.
     past_migrations: Trasferimenti passati
-    proceed_with_move: Sposta seguaci
+    proceed_with_move: Sposta i follower
     redirected_msg: Il tuo account sta reindirizzando a %{acct}.
     redirecting_to: Il tuo account sta reindirizzando a %{acct}.
     set_redirect: Imposta reindirizzamento
@@ -1627,11 +1647,11 @@ it:
     follow:
       body: "%{name} ti sta seguendo!"
       subject: "%{name} ti sta seguendo"
-      title: Nuovo seguace
+      title: Nuovo follower
     follow_request:
       action: Gestisci richieste di essere seguito
       body: "%{name} ha chiesto di seguirti"
-      subject: 'Seguace in attesa: %{name}'
+      subject: 'Follower in attesa: %{name}'
       title: Nuova richiesta di essere seguito
     mention:
       action: Rispondi
@@ -1641,7 +1661,7 @@ it:
     poll:
       subject: Un sondaggio da %{name} è terminato
     reblog:
-      body: 'Il tuo status è stato condiviso da %{name}:'
+      body: 'Il tuo post è stato condiviso da %{name}:'
       subject: "%{name} ha condiviso il tuo status"
       title: Nuova condivisione
     status:
@@ -1688,6 +1708,7 @@ it:
       self_vote: Non puoi votare nei tuoi sondaggi
       too_few_options: deve avere più di un elemento
       too_many_options: non può contenere più di %{max} elementi
+    vote: Vota
   preferences:
     other: Altro
     posting_defaults: Predefinite di pubblicazione
@@ -1696,13 +1717,13 @@ it:
     hint_html: "<strong>Personalizza il modo in cui vuoi che il tuo profilo e i tuoi post vengano trovati.</strong> Una varietà di funzionalità in Mastodon possono aiutarti a raggiungere un pubblico più ampio se abilitato. Prenditi un momento per rivedere queste impostazioni per assicurarti che si adattino al tuo caso d'uso."
     privacy: Privacy
     privacy_hint_html: Controlla quanto tu voglia mostrare a beneficio degli altri. Le persone scoprono profili interessanti e app fantastiche sfogliando il seguito di altre persone e vedendo da quali app pubblichino, ma potresti preferire tenerlo nascosto.
-    reach: Copertura
-    reach_hint_html: Controlla se vuoi essere scoperto e seguito da nuove persone. Vuoi che i tuoi post vengano visualizzati nella schermata Esplora? Vuoi che altre persone ti vedano tra i loro consigli di utenti da seguire? Vuoi accettare automaticamente tutti i nuovi seguaci o avere un controllo granulare su ciascuno di essi?
+    reach: Visibilità
+    reach_hint_html: Controlla se vuoi essere scoperto e seguito da nuove persone. Vuoi che i tuoi post vengano visualizzati nella schermata Esplora? Vuoi che altre persone ti vedano tra i loro consigli di utenti da seguire? Vuoi accettare automaticamente tutti i nuovi follower o avere un controllo granulare su ciascuno di essi?
     search: Cerca
     search_hint_html: Controlla come vuoi essere trovato. Vuoi che le persone ti trovino in base a ciò che hai postato pubblicamente? Vuoi che le persone al di fuori di Mastodon trovino il tuo profilo durante la ricerca sul web? Si prega di notare che l'esclusione totale da tutti i motori di ricerca non può essere garantita per le informazioni pubbliche.
-    title: Privacy e copertura
+    title: Privacy e visibilità
   privacy_policy:
-    title: Politica sulla privacy
+    title: Informativa sulla privacy
   reactions:
     errors:
       limit_reached: Raggiunto il limite di reazioni diverse
@@ -1717,18 +1738,18 @@ it:
     confirm_remove_selected_follows: Sei sicuro di voler rimuovere i follow selezionati?
     dormant: Dormiente
     follow_failure: Impossibile seguire alcuni degli account selezionati.
-    follow_selected_followers: Segui i seguaci selezionati
-    followers: Seguaci
+    follow_selected_followers: Segui i follower selezionati
+    followers: Follower
     following: Seguiti
     invited: Invitato
-    last_active: Ultima volta attivo
+    last_active: Ultima attività
     most_recent: Più recente
     moved: Trasferito
     mutual: Reciproco
     primary: Principale
     relationship: Relazione
-    remove_selected_domains: Rimuovi tutti i seguaci dai domini selezionati
-    remove_selected_followers: Rimuovi i seguaci selezionati
+    remove_selected_domains: Rimuovi tutti i follower dai domini selezionati
+    remove_selected_followers: Rimuovi i follower selezionati
     remove_selected_follows: Smetti di seguire gli utenti selezionati
     status: Stato dell'account
   remote_follow:
@@ -1800,8 +1821,7 @@ it:
     aliases: Alias dell'account
     appearance: Interfaccia
     authorized_apps: Applicazioni autorizzate
-    back: Torna a Mastodon
-    delete: Cancellazione account
+    back: Torna su Mastodon
     development: Sviluppo
     edit_profile: Modifica profilo
     export: Esporta
@@ -1812,7 +1832,7 @@ it:
     notifications: Notifiche e-mail
     preferences: Preferenze
     profile: Profilo
-    relationships: Follows e followers
+    relationships: Seguiti e follower
     severed_relationships: Relazioni interrotte
     statuses_cleanup: Cancellazione automatica dei post
     strikes: Sanzioni di moderazione
@@ -1824,9 +1844,9 @@ it:
       account_suspension: Sospensione dell'account (%{target_name})
       domain_block: Sospensione del server (%{target_name})
       user_domain_block: Hai bloccato %{target_name}
-    lost_followers: Seguaci persi
+    lost_followers: Follower persi
     lost_follows: Account seguiti persi
-    preamble: Potresti perdere account seguiti e seguaci quando blocchi un dominio o quando i tuoi moderatori decidono di sospendere un server remoto. Quando ciò accadrà, potrai scaricare liste di relazioni interrotte, da consultare ed eventualmente importare su un altro server.
+    preamble: Potresti perdere account seguiti e follower quando blocchi un dominio o quando i tuoi moderatori decidono di sospendere un server remoto. Quando ciò accadrà, potrai scaricare liste di relazioni interrotte, da consultare ed eventualmente importare su un altro server.
     purged: Le informazioni su questo server sono state eliminate dagli amministratori del tuo server.
     type: Evento
   statuses:
@@ -1857,25 +1877,25 @@ it:
       ownership: Non puoi fissare in cima un post di qualcun altro
       reblog: Un toot condiviso non può essere fissato in cima
     quote_policies:
-      followers: Seguaci e utenti menzionati
-      nobody: Solo gli utenti menzionati
-      public: Tutti
+      followers: Solo i follower
+      nobody: Solo io
+      public: Chiunque
     title: '%{name}: "%{quote}"'
     visibilities:
-      direct: Diretto
-      private: Mostra solo ai tuoi seguaci
-      private_long: Mostra solo ai seguaci
+      direct: Menzione privata
+      private: Solo i follower
+      private_long: Mostra solo ai follower
       public: Pubblico
       public_long: Tutti lo possono vedere
       unlisted: Pubblico, ma non visibile sulla timeline pubblica
       unlisted_long: Tutti lo possono vedere, ma non compare nelle timeline pubbliche
   statuses_cleanup:
     enabled: Cancella automaticamente i vecchi post
-    enabled_hint: Cancella automaticamente i tuoi post quando diventano più vecchi di una soglia di età specificata, a meno che non corrispondano a una delle eccezioni sotto
+    enabled_hint: Cancella automaticamente i tuoi post una volta raggiunta una soglia di età specificata, a meno che non corrispondano a una delle eccezioni sotto
     exceptions: Eccezioni
     explanation: Poiché l'eliminazione dei post è un'operazione che richiede molte risorse, questa viene eseguita quando il server non è occupato da altre operazioni. Per questo motivo, i tuoi post possono essere cancellati un po' dopo che raggiungono la soglia di età.
     ignore_favs: Ignora preferiti
-    ignore_reblogs: Ignora condivisioni
+    ignore_reblogs: Ignora le condivisioni
     interaction_exceptions: Eccezioni basate sulle interazioni
     interaction_exceptions_explanation: Tieni conto che non c'è garanzia che i post vengano cancellati se vanno al di sotto della soglia per i preferiti o i condivisi dopo averla superata.
     keep_direct: Conserva messaggi diretti
@@ -1902,7 +1922,7 @@ it:
     min_age_label: Soglia di età
     min_favs: Conserva i post preferiti più di
     min_favs_hint: Non cancella nessuno dei tuoi post che ha ricevuto almeno questo numero di preferiti. Lascia vuoto per cancellare i post indipendentemente dal loro numero di preferiti
-    min_reblogs: Conserva i post condivisi più di
+    min_reblogs: Mantieni i post condivisi almeno
     min_reblogs_hint: Non cancella nessuno dei tuoi post che è stato condiviso più di questo numero di volte. Lascia vuoto per cancellare i post indipendentemente dal loro numero di condivisioni
   stream_entries:
     sensitive_content: Materiale sensibile
@@ -1913,6 +1933,11 @@ it:
     does_not_match_previous_name: non corrisponde al nome precedente
   terms_of_service:
     title: Termini di Servizio
+  terms_of_service_interstitial:
+    future_preamble_html: Stiamo apportando alcune modifiche ai nostri termini di servizio, che entreranno in vigore in data <strong>%{date}</strong>. Ti invitiamo a consultare i termini aggiornati.
+    past_preamble_html: Abbiamo modificato i nostri termini di servizio dalla tua ultima visita. Ti invitiamo a consultare i termini aggiornati.
+    review_link: Rivedi i termini di servizio
+    title: I termini di servizio di %{domain} stanno cambiando
   themes:
     contrast: Mastodon (contrasto elevato)
     default: Mastodon (scuro)
@@ -2052,7 +2077,6 @@ it:
       post_action: Scrivi
       post_step: Salutate il mondo con testo, foto, video o sondaggi.
       post_title: Scrivi il tuo primo post
-      share_action: Condividi
       share_step: Fai sapere ai tuoi amici come trovarti su Mastodon.
       share_title: Condividi il tuo profilo Mastodon
       sign_in_action: Accedi

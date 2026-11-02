@@ -141,14 +141,14 @@ eo:
       security_measures:
         only_password: Nur pasvorto
         password_and_2fa: Pasvorto kaj 2FA
-      sensitive: Tikla
+      sensitive: Devigite tikla
       sensitized: Markita kiel tikla
       shared_inbox_url: URL de kunhavigita leterkesto
       show:
         created_reports: Faritaj raportoj
         targeted_reports: Raporitaj de aliaj
       silence: Limigi
-      silenced: Silentigita
+      silenced: Limigita
       statuses: Afiŝoj
       strikes: Antaǔaj admonoj
       subscribe: Aboni
@@ -223,7 +223,7 @@ eo:
         reset_password_user: Restarigi Pasvorton
         resolve_report: Solvitaj reporto
         sensitive_account: Marki tikla la aŭdovidaĵojn de via konto
-        silence_account: Silentigi Konton
+        silence_account: Limigi Konton
         suspend_account: Suspendi Konton
         unassigned_report: Malatribui Raporton
         unblock_email_account: Malbloki retpoŝtadreson
@@ -578,6 +578,12 @@ eo:
         all: Ĉiuj
         limited: Limigita
         title: Moderigado
+      moderation_notes:
+        create: Aldoni moderigan noton
+        created_msg: Noto pri moderigo de instanco sukcese kreita!
+        description_html: Vidu kaj lasu notojn por aliaj moderigantoj kaj via estonta memo
+        destroyed_msg: Noto pri moderigo de instanco sukcese forigita!
+        title: Notoj de moderigado
       private_comment: Privata komento
       public_comment: Publika komento
       purge: Purigu
@@ -586,7 +592,7 @@ eo:
       total_blocked_by_us: Blokitaj de ni
       total_followed_by_them: Sekvataj de ili
       total_followed_by_us: Sekvataj de ni
-      total_reported: Signaloj pri ili
+      total_reported: Raportoj pri ili
       total_storage: Aŭdovidaj kunsendaĵoj
       totals_time_period_hint_html: Sumo montritas malsupre inkluzivas datumo ekde komenco.
       unknown_instance: Nuntempe ne ekzistas registro pri ĉi tiu domajno sur ĉi tiu servilo.
@@ -667,7 +673,7 @@ eo:
       comment_description_html: 'Por doni pli da informo, %{name} skribis:'
       confirm: Konfirmi
       confirm_action: Konfirmi moderigadagon kontra @%{acct}
-      created_at: Signalita
+      created_at: Raportita
       delete_and_resolve: Forigi afiŝojn
       forwarded: Plusendita
       forwarded_replies_explanation: Ĉi tiu raporto estas de malproksima uzanto kaj estas pri malproksima enhavo. Ĝi plusendis al vi ĉar la raportita enhavo estas rediraĵo je unu el viaj uzantoj.
@@ -688,9 +694,9 @@ eo:
       quick_actions_description_html: 'Agu au movu malsupre por vidi raportitajn enhavojn:'
       remote_user_placeholder: la ekstera uzanto de %{instance}
       reopen: Remalfermi signalon
-      report: 'Signalo #%{id}'
-      reported_account: Signalita konto
-      reported_by: Signalita de
+      report: 'Raporto #%{id}'
+      reported_account: Raportita konto
+      reported_by: Raportita de
       reported_with_application: Raportita per aplikaĵo
       resolved: Solvitaj
       resolved_msg: Signalo sukcese solvita!
@@ -717,7 +723,7 @@ eo:
         send_email_html: Sendu <strong>@%{acct}</strong> retpoŝto de averto
         warning_placeholder: Nedeviga aldona kialo por la moderigadago.
       target_origin: Origino de raportita konto
-      title: Signaloj
+      title: Raportoj
       unassign: Malasigni
       unknown_action_msg: 'Nekonata ago: %{action}'
       unresolved: Nesolvitaj
@@ -786,17 +792,24 @@ eo:
       title: Roloj
     rules:
       add_new: Aldoni regulon
+      add_translation: Aldoni tradukon
       delete: Forigi
       description_html: Kvankam plej da personoj pretendas legi kaj asenti servkondiĉoj, personoj kutime ne komplete legi. <strong>Uzu mallonga kaj simpla listo.</strong>.
       edit: Redakti la regulon
       empty: Neniuj servilregulojn definitas ĝis nun.
+      move_down: Movi malsupren
+      move_up: Movi supren
       title: Reguloj de la servilo
+      translation: Traduko
+      translations: Tradukoj
     settings:
       about:
         manage_rules: Administri servilregulojn
         preamble: Donu specifan informon pri kiel la servilo operaciitas, administras kaj financitas.
         rules_hint: Havas apartan areon por regulojn kiujn via uzantoj devus sekvi.
         title: Pri
+      allow_referrer_origin:
+        title: Permesi al eksteraj retejoj vidi vian Mastodon-servilon kiel trafikfonton
       appearance:
         preamble: Personecigi retinterfaco de Mastodon.
         title: Aspekto
@@ -816,9 +829,9 @@ eo:
       discovery:
         follow_recommendations: Sekvorekomendoj
         preamble: Interesa enhavo estas grava por novaj uzantoj kiuj eble ne konas ajn iun.
+        privacy: Privateco
         profile_directory: Profilujo
         public_timelines: Publikaj templinioj
-        publish_discovered_servers: Publikigi la malkovritajn servilojn
         publish_statistics: Publikigi statistikojn
         title: Eltrovado
         trends: Tendencoj
@@ -1137,7 +1150,7 @@ eo:
     add_new: Krei alinomon
     created_msg: Kreis novan alinomon sukcese. Vi povas inici la transloki el la malnovan konton nun.
     deleted_msg: Forigis la alinomon sukcese. Transloki el tiu konto al ĉi tiu ne plu eblos.
-    empty: Vi havas neniun kaŝnomon.
+    empty: Vi havas neniun alinomon.
     hint_html: Se vi volas translokiĝi de alia konto al ĉi tie, kreu alinomon. Ĝi estas <strong>sekura kaj inversebla</strong>. <strong>Ĝi komencitas de malnova konto</strong>.
     remove: Malligili alinomon
   appearance:
@@ -1164,7 +1177,7 @@ eo:
     regenerate_token: Regeneri aliran ĵetonon
     token_regenerated: Alira ĵetono sukcese regeneria
     warning: Estu tre atenta kun ĉi tiu datumo. Neniam diskonigu ĝin al iu ajn!
-    your_token: Via alira ĵetono
+    your_token: Via alirilo
   auth:
     apply_for_account: Peti konton
     captcha_confirmation:
@@ -1192,7 +1205,7 @@ eo:
     forgot_password: Pasvorto forgesita?
     invalid_reset_password_token: La ĵetono por restarigi la pasvorton estas nevalida aŭ eksvalida. Bonvolu peti novon.
     link_to_otp: Enigu 2-faktorkodo de via telefono au regajnkodo
-    link_to_webauth: Uzi vian sekurecan ŝlosilon
+    link_to_webauth: Uzi vian aparaton de sekuriga ŝlosilo
     log_in_with: Ensaluti per
     login: Ensaluti
     logout: Adiaŭi
@@ -1235,7 +1248,7 @@ eo:
       preamble: Per konto ĉe ĉi tiu Mastodon-servilo, vi povos sekvi ajnan alian personon ĉe la fediverso, sendepende de kie ilia konto estas gastigita.
       title: Ni pretigu vin ĉe %{domain}.
     status:
-      account_status: Statuso de la konto
+      account_status: Stato de la konto
       confirming: Atendante ke retpoŝta konfirmo estos kompletigita.
       functional: Via konto estas tute funkcia.
       pending: Via apliko estas superrigardata de niaj teamo. Ĉi tiu povas bezoni iom da tempo. Vi ricevos retpoŝton, se via apliko estas konsentita.
@@ -1283,13 +1296,12 @@ eo:
   deletes:
     challenge_not_passed: La informaĵo ke vi enigis estis malĝusta
     confirm_password: Enmetu vian nunan pasvorton por konfirmi vian identecon
-    confirm_username: Enigi vian uzantnomon por konfirmi la procedo
     proceed: Forigi konton
     success_msg: Via konto estis sukcese forigita
     warning:
       before: 'Antau ol dauri, legu ĉi tiujn notojn zorgeme:'
       caches: Enhavo kiu kaŝmemorigitas de aliaj serviloj eble restas
-      data_removal: Viaj afiŝoj kaj aliaj informoj estos forigita por eterne
+      data_removal: Viaj afiŝoj kaj aliaj informoj estos forigita por ĉiam
       email_change_html: Vi povas <a href="%{path}">ŝanĝi vian retadreson</a> sen forigi vian konton
       email_contact_html: Se ĝi ankoraŭ ne alvenas, vi povas retpoŝti al <a href="mailto:%{email}">%{email}</a> por helpo
       email_reconfirmation_html: Se vi ne ricevas la konfirmretpoŝton, vi povas <a href="%{path}">denove peti</a>
@@ -1370,7 +1382,7 @@ eo:
     add_new: Aldoni novan
     errors:
       limit: Vi jam elstarigis la maksimuman kvanton da kradvortoj
-    hint_html: "<strong>Kio estas la trajtaj kradvortoj?</strong> Ili bone videblas en via publika profilo kaj permesas al homoj trarigardi viajn publikajn mesaĝojn specife laŭ tiuj kradvortoj. Ili estas bonaj iloj por sekvi la evoluon de kreadaj laboroj aŭ longdaŭraj projektoj."
+    hint_html: "<strong>Elstarigu viajn plej gravajn kradvortojn en via profilo.</strong> Bona ilo por sekvi viaj kreaĵoj aŭ longdaŭraj projektoj, elstarigitaj kradvortoj bone videblas en via publika profilo kaj ebligas rapidan aliron al viaj propraj afiŝoj."
   filters:
     contexts:
       account: Profiloj
@@ -1690,6 +1702,7 @@ eo:
       self_vote: Vi ne povas voĉdoni en viaj propraj balotenketoj
       too_few_options: devas enhavi pli da unu propono
       too_many_options: ne povas enhavi pli da %{max} proponoj
+    vote: Voĉdoni
   preferences:
     other: Aliaj aferoj
     posting_defaults: Afiŝaj defaŭltoj
@@ -1727,12 +1740,12 @@ eo:
     most_recent: Plej lasta
     moved: Moviĝita
     mutual: Reciproka
-    primary: Primara
+    primary: Ĉefa
     relationship: Rilato
     remove_selected_domains: Forigi ĉiujn sekvantojn el la selektitaj domajnoj
     remove_selected_followers: Forigi selektitajn sekvantojn
     remove_selected_follows: Ne plu sekvi elektitajn uzantojn
-    status: Statuso de la konto
+    status: Stato de la konto
   remote_follow:
     missing_resource: La bezonata URL de plusendado por via konto ne estis trovita
   reports:
@@ -1787,14 +1800,14 @@ eo:
       ios: iOS
       kai_os: KaiOS
       linux: Linux
-      mac: Mac
+      mac: macOS
       unknown_platform: Nekonata platformo
       windows: Windows
       windows_mobile: Windows Mobile
       windows_phone: Windows Phone
     revoke: Malvalidigi
     revoke_success: Seanco sukcese malvalidigita
-    title: Seancoj
+    title: Salutaĵoj
     view_authentication_history: Vidi autentighistorion de via konto
   settings:
     account: Konto
@@ -1803,7 +1816,6 @@ eo:
     appearance: Apero
     authorized_apps: Rajtigitaj aplikaĵoj
     back: Reveni al Mastodon
-    delete: Konta forigo
     development: Evoluigado
     edit_profile: Redakti profilon
     export: Eksporti
@@ -1812,7 +1824,7 @@ eo:
     import_and_export: Importi kaj eksporti
     migrate: Konta migrado
     notifications: Retpoŝtaj sciigoj
-    preferences: Preferoj
+    preferences: Agordoj
     profile: Publika profilo
     relationships: Sekvatoj kaj sekvantoj
     severed_relationships: Finitaj rilatoj
@@ -1858,9 +1870,13 @@ eo:
       limit: Vi jam atingis la maksimuman nombron de alpinglitaj mesaĝoj
       ownership: Mesaĝo de iu alia ne povas esti alpinglita
       reblog: Diskonigo ne povas esti alpinglita
+    quote_policies:
+      followers: Nur sekvantoj
+      nobody: Nur mi
+      public: Iu ajn
     title: "%{name}: “%{quote}”"
     visibilities:
-      direct: Rekta
+      direct: Privada mencio
       private: Montri nur al sekvantoj
       private_long: Montri nur al sekvantoj
       public: Publika
@@ -1911,6 +1927,9 @@ eo:
     does_not_match_previous_name: ne kongruas kun la antaŭa nomo
   terms_of_service:
     title: Kondiĉoj de uzado
+  terms_of_service_interstitial:
+    past_preamble_html: Ni ŝanĝis niajn servkondiĉojn ekde via lasta vizito. Ni instigas vin revizii la ĝisdatigitajn kondiĉojn.
+    title: La servkondiĉoj de %{domain} ŝanĝiĝas
   themes:
     contrast: Mastodon (Forta kontrasto)
     default: Mastodon (Malhela)
@@ -2050,7 +2069,6 @@ eo:
       post_action: Redakti
       post_step: Salutu la mondon per teksto, fotoj, filmetoj aŭ balotenketoj.
       post_title: Faru vian unuan afiŝon
-      share_action: Kundividi
       share_step: Sciigu viajn amikojn kiel trovi vin sur Mastodon.
       share_title: Kunhavigu vian Mastodon-profilon
       sign_in_action: Ensaluti
@@ -2088,4 +2106,4 @@ eo:
     not_enabled: Vi ankoraŭ ne ŝaltis WebAuth
     not_supported: Ĉi tiu legilo ne povas uzi sekurecŝlosilojn
     otp_required: Por uzi sekurecŝlosilojn, ebligu 2-faktoran autentigon unue.
-    registered_on: Registrigita je %{date}
+    registered_on: Registrita je %{date}

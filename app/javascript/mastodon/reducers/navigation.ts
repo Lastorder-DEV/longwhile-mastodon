@@ -1,16 +1,20 @@
 import { createReducer } from '@reduxjs/toolkit';
 
-import { closeNavigation, openNavigation, toggleNavigation } from '../actions/navigation';
+import {
+  openNavigation,
+  closeNavigation,
+  toggleNavigation,
+} from 'mastodon/actions/navigation';
 
-export interface NavigationState {
+interface State {
   open: boolean;
 }
 
-const initialState: NavigationState = {
+const initialState: State = {
   open: false,
 };
 
-export const navigationReducer = createReducer(initialState, builder => {
+export const navigationReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(openNavigation, (state) => {
       state.open = true;
@@ -22,4 +26,3 @@ export const navigationReducer = createReducer(initialState, builder => {
       state.open = !state.open;
     });
 });
-

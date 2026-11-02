@@ -29,7 +29,7 @@ import { me, showTrends } from '../../initial_state';
 import { NavigationBar } from '../compose/components/navigation_bar';
 import ColumnLink from '../ui/components/column_link';
 
-import TrendsContainer from './containers/trends_container';
+import { Trends } from './components/trends';
 
 const messages = defineMessages({
   direct: { id: 'navigation_bar.direct', defaultMessage: 'Private mentions' },
@@ -128,7 +128,7 @@ class GettingStarted extends ImmutablePureComponent {
           <LinkFooter multiColumn />
         </div>
 
-        {(multiColumn && showTrends) && <TrendsContainer />}
+        {(multiColumn && showTrends) && <Trends />}
 
         <Helmet>
           <title>{intl.formatMessage(messages.menu)}</title>

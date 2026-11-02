@@ -68,8 +68,6 @@ class Tags extends PureComponent {
 
     return (
       <div className='scrollable explore__links' data-nosnippet>
-        {banner}
-
         {isLoading ? (<LoadingIndicator />) : hashtags.map(hashtag => (
           <Hashtag key={hashtag.get('name')} hashtag={hashtag} />
         ))}

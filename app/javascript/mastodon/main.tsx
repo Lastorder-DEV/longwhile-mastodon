@@ -2,6 +2,8 @@ import { createRoot } from 'react-dom/client';
 
 import { defineMessages } from 'react-intl';
 
+import { Globals } from '@react-spring/web';
+
 import { showAlert } from 'mastodon/actions/alerts';
 import { importFetchedAccount } from 'mastodon/actions/importer';
 import { setupBrowserNotifications } from 'mastodon/actions/notifications';
@@ -9,7 +11,7 @@ import api, { setActiveAccountToken } from 'mastodon/api';
 import { MULTI_ACCOUNT_REQUEST_TIMEOUT } from 'mastodon/api/multi_accounts_constants';
 import type { ApiAccountJSON } from 'mastodon/api_types/accounts';
 import Mastodon from 'mastodon/containers/mastodon';
-import { getAccessToken, me } from 'mastodon/initial_state';
+import { getAccessToken, me, reduceMotion } from 'mastodon/initial_state';
 import * as perf from 'mastodon/performance';
 import ready from 'mastodon/ready';
 import { store } from 'mastodon/store';
@@ -147,6 +149,12 @@ function main() {
     const props = JSON.parse(
       mountNode.getAttribute('data-props') ?? '{}',
     ) as Record<string, unknown>;
+
+    if (reduceMotion) {
+      Globals.assign({
+        skipAnimation: true,
+      });
+    }
 
     const root = createRoot(mountNode);
     root.render(<Mastodon {...props} />);

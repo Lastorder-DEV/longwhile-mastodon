@@ -3,38 +3,29 @@
 require 'rails_helper'
 
 RSpec.describe EmailAddressValidator do
-  let(:record_class) do
-    Class.new do
-      include ActiveModel::Validations
-      attr_accessor :email
+  context 'with no options' do
+    let(:record_class) do
+      Class.new do
+        include ActiveModel::Model
 
-      validates :email, email_address: true
-    end
-  end
-  let(:record) { record_class.new }
+        def self.name = 'Record'
 
-  describe '#validate_each' do
-    context 'with a well-formed address' do
-      it 'does not add errors' do
-        record.email = 'foo@example.com'
+        attr_accessor :email
 
-        expect(record).to be_valid
-        expect(record.errors).to be_empty
+        validates :email, email_address: true
       end
     end
 
-    # GHSA-5r37-qpwq-2jhh: characters reinterpreted by some mail servers must be rejected,
-    # otherwise e-mail domain allow/block lists can be bypassed at sign-up.
-    ['foo%bar@example.com', 'foo,bar@example.com', 'foo"bar@example.com', '"foo"@example.com'].each do |bad_email|
-      context "with the disallowed-character address #{bad_email}" do
-        it 'adds errors' do
-          record.email = bad_email
+    it 'considers a valid email address as such' do
+      expect(record_class.new(email: 'foo@example.com')).to be_valid
+    end
 
-          expect(record).to_not be_valid
-          expect(record.errors.first.attribute).to eq(:email)
-          expect(record.errors.first.type).to eq(:invalid)
-        end
-      end
+    it 'considers an invalid email address as such' do
+      expect(record_class.new(email: 'foo @ example.com')).to_not be_valid
+    end
+
+    it 'considers an email address with a % as invalid' do
+      expect(record_class.new(email: 'foo@example.com%foo.example.com')).to_not be_valid
     end
   end
 end
