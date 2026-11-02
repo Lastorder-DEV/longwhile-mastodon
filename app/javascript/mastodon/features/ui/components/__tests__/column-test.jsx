@@ -1,4 +1,7 @@
+import { Provider } from 'react-redux';
+
 import { render, fireEvent, screen } from '@/testing/rendering';
+import { store } from 'mastodon/store';
 
 import Column from '../column';
 
