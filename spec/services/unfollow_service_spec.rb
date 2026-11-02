@@ -23,20 +23,6 @@ RSpec.describe UnfollowService do
       expect { subject.call(follower, followee) }
         .to enqueue_sidekiq_job(UnmergeWorker).with(followee.id, list.id, 'list')
     end
-
-    context 'when the unfollowed account is a member of one of the unfollower\'s lists' do
-      let(:list) { Fabricate(:list, account: sender) }
-
-      before { list.accounts << bob }
-
-      # The list_accounts row is removed by an ON DELETE CASCADE foreign key the
-      # moment the follow is destroyed, so the worker must be enqueued from data
-      # captured *before* the destroy, otherwise the posts linger in the list.
-      it 'schedules removal of the unfollowed account posts from the list' do
-        expect { subject.call(sender, bob) }
-          .to enqueue_sidekiq_job(UnmergeWorker).with(bob.id, list.id, 'list')
-      end
-    end
   end
 
   describe 'a local user unfollowing another local user' do

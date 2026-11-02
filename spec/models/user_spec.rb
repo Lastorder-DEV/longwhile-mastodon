@@ -561,7 +561,7 @@ RSpec.describe User do
                 long_lived: true,
                 revoked_at: nil)
     end
-    let(:redis_pipeline_stub) { instance_double(Redis::Namespace, publish: nil) }
+    let(:redis_pipeline_stub) { instance_double(Redis, publish: nil) }
 
     before do
       allow(redis).to receive(:pipelined).and_yield(redis_pipeline_stub)
@@ -591,8 +591,8 @@ RSpec.describe User do
         expect(standard_token.reload.revoked_at).to be_present
         expect(long_lived_refresh_token.reload.revoked_at).to be_nil
         expect(redis_pipeline_stub).to have_received(:publish).with("timeline:access_token:#{standard_token.id}", Oj.dump(event: :kill))
-        expect(redis_pipeline_stub).not_to have_received(:publish).with("timeline:access_token:#{multi_account_token.id}", anything)
-        expect(redis_pipeline_stub).not_to have_received(:publish).with("timeline:access_token:#{long_lived_refresh_token.id}", anything)
+        expect(redis_pipeline_stub).to_not have_received(:publish).with("timeline:access_token:#{multi_account_token.id}", anything)
+        expect(redis_pipeline_stub).to_not have_received(:publish).with("timeline:access_token:#{long_lived_refresh_token.id}", anything)
       end
     end
   end
