@@ -45,6 +45,7 @@ class StatusCacheHydrator
       payload[:filtered]   = payload[:reblog][:filtered]
       payload[:favourited] = payload[:reblog][:favourited]
       payload[:reblogged]  = payload[:reblog][:reblogged]
+      payload[:replied]    = payload[:reblog][:replied]
     end
   end
 
@@ -53,6 +54,7 @@ class StatusCacheHydrator
     payload[:reblogged]  = Status.exists?(account_id: account_id, reblog_of_id: status.id)
     payload[:muted]      = ConversationMute.exists?(account_id: account_id, conversation_id: status.conversation_id)
     payload[:bookmarked] = Bookmark.exists?(account_id: account_id, status_id: status.id)
+    payload[:replied]    = status.replies.exists?(account_id: account_id)
     payload[:pinned]     = StatusPin.exists?(account_id: account_id, status_id: status.id) if status.account_id == account_id
     payload[:filtered]   = mapped_applied_custom_filter(account_id, status)
     payload[:quote] = hydrate_quote_payload(payload[:quote], status.quote, account_id, nested:) if payload[:quote]
