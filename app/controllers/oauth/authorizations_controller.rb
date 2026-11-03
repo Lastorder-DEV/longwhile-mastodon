@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
-class Oauth::AuthorizationsController < Doorkeeper::AuthorizationsController
+class OAuth::AuthorizationsController < Doorkeeper::AuthorizationsController
   skip_before_action :authenticate_resource_owner!
 
   before_action :store_current_location, only: :new
   before_action :handle_multi_account_force_login
   before_action :authenticate_resource_owner!
+
+  layout 'modal'
 
   content_security_policy do |p|
     p.form_action(false)

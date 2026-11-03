@@ -51,8 +51,21 @@
   --rich-text-container-color: rgb(24, 64, 87);
   --rich-text-text-color: rgb(175, 226, 255);
   --rich-text-decorations-color: rgb(58, 98, 128);
+  --nested-card-background: color(from #{$ui-highlight-color} srgb r g b / 5%);
+  --nested-card-text: #{$secondary-text-color};
+  --nested-card-border: 1px solid
+    color(from #{$ui-highlight-color} srgb r g b / 15%);
   --input-placeholder-color: #{$dark-text-color};
   --input-background-color: rgb(14, 14, 16);
   --on-input-color: #{$secondary-text-color};
   --color-column: transparent;
+}
+
+body {
+  // Variable for easily inverting directional UI elements,
+  --text-x-direction: 1;
+
+  &.rtl {
+    --text-x-direction: -1;
+  }
 }

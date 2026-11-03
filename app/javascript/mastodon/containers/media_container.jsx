@@ -33,8 +33,6 @@ export default class MediaContainer extends PureComponent {
   };
 
   handleOpenMedia = (media, index, lang) => {
-    document.body.classList.add('with-modals--active');
-
     this.setState({ media, index, lang });
   };
 
@@ -43,14 +41,10 @@ export default class MediaContainer extends PureComponent {
     const { media } = JSON.parse(components[options.componentIndex].getAttribute('data-props'));
     const mediaList = fromJS(media);
 
-    document.body.classList.add('with-modals--active');
-
     this.setState({ media: mediaList, lang, options });
   };
 
   handleCloseMedia = () => {
-    document.body.classList.remove('with-modals--active');
-
     this.setState({
       media: null,
       index: null,

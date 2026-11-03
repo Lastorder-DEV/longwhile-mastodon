@@ -22,7 +22,7 @@ import { RemoteHint } from 'mastodon/components/remote_hint';
 
 import { AccountHeader } from './components/account_header';
 import { LimitedAccountHint } from './components/limited_account_hint';
-import { FeaturedCarousel } from '../../components/featured_carousel';
+import { FeaturedCarousel } from '@/mastodon/components/featured_carousel';
 
 const emptyList = ImmutableList();
 

@@ -265,9 +265,7 @@ class Auth::SessionsController < Devise::SessionsController
     )
 
     # Only send a notification email every hour at most
-    return if redis.get("2fa_failure_notification:#{user.id}").present?
-
-    redis.set("2fa_failure_notification:#{user.id}", '1', ex: 1.hour)
+    return if redis.set("2fa_failure_notification:#{user.id}", '1', ex: 1.hour, get: true).present?
 
     UserMailer.failed_2fa(user, request.remote_ip, request.user_agent, Time.now.utc).deliver_later!
   end
@@ -276,14 +274,14 @@ class Auth::SessionsController < Devise::SessionsController
     "2fa_auth_attempts:#{user.id}:#{Time.now.utc.hour}"
   end
 
-  def respond_to_on_destroy
+  def respond_to_on_destroy(**)
     respond_to do |format|
       format.json do
         render json: {
           redirect_to: after_sign_out_path_for(resource_name),
         }, status: 200
       end
-      format.all { super }
+      format.all { super(**) }
     end
   end
 end

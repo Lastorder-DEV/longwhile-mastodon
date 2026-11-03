@@ -23,7 +23,7 @@ import { useColumnsContext } from '../util/columns_context';
 
 import BundleColumnError from './bundle_column_error';
 import { ColumnLoading } from './column_loading';
-import ComposePanel from './compose_panel';
+import { ComposePanel, RedirectToMobileComposeIfNeeded } from './compose_panel';
 import DrawerLoading from './drawer_loading';
 import NavigationPanel, { CollapsibleNavigationPanel } from './navigation_panel';
 
@@ -143,6 +143,8 @@ export default class ColumnsArea extends ImmutablePureComponent {
               </div>
             </div>
           )}
+
+          <RedirectToMobileComposeIfNeeded />
 
           <div className='columns-area__panels__main'>
             <div className='tabs-bar__wrapper'><TabsBarPortal /></div>

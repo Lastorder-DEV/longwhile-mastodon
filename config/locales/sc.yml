@@ -754,7 +754,6 @@ sc:
   deletes:
     challenge_not_passed: S'informatzione insertada no est curreta
     confirm_password: Inserta·nche sa crae atuale pro verificare s'identidade
-    confirm_username: Iscrie su nòmine de utente tuo cunfirmare su protzedimentu
     proceed: Cantzella su contu
     success_msg: Contu cantzelladu
     warning:
@@ -1116,7 +1115,6 @@ sc:
     appearance: Aspetu
     authorized_apps: Aplicatziones autorizadas
     back: Torra a Mastodon
-    delete: Eliminatzione de su contu
     development: Isvilupu
     edit_profile: Modìfica profilu
     featured_tags: Etichetas in evidèntzia
@@ -1154,7 +1152,6 @@ sc:
       reblog: Is cumpartziduras non podent èssere apicadas
     title: '%{name}: "%{quote}"'
     visibilities:
-      direct: Deretu
       private: Isceti pro chie ti sighit
       private_long: Ammustra isceti a chie ti sighit
       public: Pùblicu
@@ -1240,7 +1237,6 @@ sc:
       follow_title: Personaliza s'ischermu printzipale
       post_action: Iscrie
       post_title: Pùblica pro sa primu borta
-      share_action: Cumpartzi
       share_title: Cumpartzi su profilu tuo de Mastodon
       sign_in_action: Intra
       subject: Ti donamus su benebènnidu a Mastodon

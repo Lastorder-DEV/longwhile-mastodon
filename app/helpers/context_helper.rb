@@ -24,8 +24,14 @@ module ContextHelper
     memorial: { 'toot' => 'http://joinmastodon.org/ns#', 'memorial' => 'toot:memorial' },
     voters_count: { 'toot' => 'http://joinmastodon.org/ns#', 'votersCount' => 'toot:votersCount' },
     suspended: { 'toot' => 'http://joinmastodon.org/ns#', 'suspended' => 'toot:suspended' },
-    attribution_domains: { 'toot' => 'http://joinmastodon.org/ns#', 'attributionDomains' => { '@id' => 'toot:attributionDomains', '@type' => '@id' } },
+    attribution_domains: { 'toot' => 'http://joinmastodon.org/ns#', 'attributionDomains' => { '@id' => 'toot:attributionDomains', '@container' => '@set' } },
     quote_requests: { 'QuoteRequest' => 'https://w3id.org/fep/044f#QuoteRequest' },
+    quotes: {
+      'quote' => { '@id' => 'https://w3id.org/fep/044f#quote', '@type' => '@id' },
+      'quoteUri' => 'http://fedibird.com/ns#quoteUri',
+      '_misskey_quote' => 'https://misskey-hub.net/ns#_misskey_quote',
+      'quoteAuthorization' => { '@id' => 'https://w3id.org/fep/044f#quoteAuthorization', '@type' => '@id' },
+    },
     interaction_policies: {
       'gts' => 'https://gotosocial.org/ns#',
       'interactionPolicy' => { '@id' => 'gts:interactionPolicy', '@type' => '@id' },

@@ -20,7 +20,7 @@ class PerOperationWithDeadline < HTTP::Timeout::PerOperation
     @read_deadline = options.fetch(:read_deadline, READ_DEADLINE)
   end
 
-  def connect(socket_class, host, port, nodelay = false)
+  def connect(socket_class, host, port, nodelay = false) # rubocop:disable Style/OptionalBooleanParameter
     @socket = socket_class.open(host, port)
     @socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1) if nodelay
   end
@@ -179,7 +179,7 @@ class Request
       return
     end
 
-    signature_value = @signing.sign(signed_headers.without('User-Agent', 'Accept-Encoding'), @verb, Addressable::URI.parse(request.uri))
+    signature_value = @signing.sign(signed_headers.without('User-Agent', 'Accept-Encoding', 'Accept'), @verb, Addressable::URI.parse(request.uri))
     request.headers['Signature'] = signature_value
   end
 

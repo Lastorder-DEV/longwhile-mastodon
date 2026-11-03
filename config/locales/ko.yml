@@ -200,13 +200,14 @@ ko:
         create_canonical_email_block: 이메일 차단 생성
         create_custom_emoji: 커스텀 에모지 생성
         create_domain_allow: 도메인 허용 생성
-        create_domain_block: 도메인 차단 추가
+        create_domain_block: 도메인 차단 만들기
         create_email_domain_block: 이메일 도메인 차단 생성
         create_ip_block: IP 규칙 만들기
         create_relay: 릴레이 생성
         create_unavailable_domain: 사용 불가능한 도메인 생성
         create_user_role: 역할 생성
         demote_user: 사용자 강등
+        destroy_account: 계정 정보 삭제
         destroy_announcement: 공지사항 삭제
         destroy_canonical_email_block: 이메일 차단 삭제
         destroy_custom_emoji: 커스텀 에모지 삭제
@@ -348,7 +349,7 @@ ko:
       unpublish: 게시 취소
       unpublished_msg: 공지가 성공적으로 발행 취소되었습니다!
       updated_msg: 공지가 성공적으로 업데이트되었습니다!
-    critical_update_pending: 긴급 업데이트 보류 중
+    critical_update_pending: 긴급 업데이트 대기중
     custom_emojis:
       assign_category: 분류 지정
       by_domain: 도메인
@@ -521,7 +522,7 @@ ko:
           title: FASP 가입 확인
         save: 저장
         select_capabilities: 권한 선택
-        sign_in: 가입
+        sign_in: 로그인
         status: 상태
         title: 연합우주 보조 서비스 제공자
       title: FASP
@@ -590,6 +591,13 @@ ko:
         all: 모두
         limited: 제한
         title: 중재
+      moderation_notes:
+        create: 중재 참고사항 추가
+        created_msg: 서버 중재 참고사항을 만들었습니다!
+        description_html: 확인하고 다른 중재자나 미래의 자신을 위해 참고사항을 작성합니다
+        destroyed_msg: 서버 중재 참고사항을 삭제했습니다!
+        placeholder: 이 인스턴스에 대한 정보, 취한 조치, 이후 이 서버를 중재하기 위해 도움이 될 어떤 것이든 좋습니다.
+        title: 중재 참고사항
       private_comment: 비공개 주석
       public_comment: 공개 주석
       purge: 퍼지
@@ -665,7 +673,7 @@ ko:
       add_to_report: 신고에 더 추가하기
       already_suspended_badges:
         local: 이 서버에서 이미 정지되었습니다
-        remote: 저 서버에서 이미 정지되었습니다
+        remote: 이미 해당 서버에서 정지함
       are_you_sure: 확실합니까?
       assign_to_self: 나에게 할당하기
       assigned: 할당된 중재자
@@ -798,17 +806,26 @@ ko:
       title: 역할
     rules:
       add_new: 규칙 추가
+      add_translation: 번역 추가
       delete: 삭제
       description_html: 대부분의 사람들은 서비스 약관을 읽고 동의한다고 밝힙니다만, 대개 문제가 발생하기 전까지는 약관을 자세히 읽어보지 않습니다. <strong>서버의 운영원칙을 단일한 글머리 기호 목록으로 제공하여 한 눈에 쉽게 확인할 수 있도록 하세요.</strong> 각 규칙을 짧고 간결하게 유지하되, 많은 항목으로 나누지 않도록 하세요.
       edit: 규칙 수정
       empty: 아직 정의된 서버 규칙이 없습니다.
+      move_down: 아래로 이동
+      move_up: 위로 이동
       title: 서버 규칙
+      translation: 번역
+      translations: 번역
+      translations_explanation: 규칙에 대한 번역을 추가할 수 있습니다. 번역된 버전이 없다면 원문이 보여질 것입니다. 항상 원문과 번역본의 내용이 일치하는지 확인하세요.
     settings:
       about:
         manage_rules: 서버 규칙 관리
         preamble: 이 서버가 어떻게 운영되고, 중재되고, 자금을 조달하는지 등에 관한 자세한 정보를 기입하세요.
         rules_hint: 사용자들이 준수해야 할 규칙들을 위한 전용 공간입니다.
         title: 정보
+      allow_referrer_origin:
+        desc: 사용자가 외부 사이트 링크를 클릭한 경우 브라우저는 마스토돈 서버 주소를 리퍼러로 보내게 됩니다. 이 서버가 개인 서버인 경우 등 사용자를 식별할 수 있는 경우 이 기능을 비활성화하세요.
+        title: 외부 사이트가 이 마스토돈 서버를 트래픽 소스로 볼 수 있도록 허용
       appearance:
         preamble: 마스토돈의 웹 인터페이스를 변경
         title: 외관
@@ -828,9 +845,9 @@ ko:
       discovery:
         follow_recommendations: 팔로우 추천
         preamble: 흥미로운 콘텐츠를 노출하는 것은 마스토돈을 알지 못할 수도 있는 신규 사용자를 유입시키는 데 중요합니다. 이 서버에서 작동하는 다양한 발견하기 기능을 제어합니다.
+        privacy: 개인정보
         profile_directory: 프로필 책자
         public_timelines: 공개 타임라인
-        publish_discovered_servers: 발견 된 서버들 발행
         publish_statistics: 통계 발행
         title: 발견하기
         trends: 유행
@@ -953,6 +970,8 @@ ko:
     system_checks:
       database_schema_check:
         message_html: 대기 중인 데이터베이스 마이그레이션이 있습니다. 애플리케이션이 예상대로 동작할 수 있도록 마이그레이션을 실행해 주세요
+      elasticsearch_analysis_index_mismatch:
+        message_html: Elasticsearch 인덱스 아날라이저 설정이 업데이트되지 않았습니다. <code>tootctl search deploy --only-mapping --only=%{value}</code> 명령을 실행해주세요
       elasticsearch_health_red:
         message_html: Elasticsearch 클러스터가 비정상(red)상태입니다. 검색 기능이 동작하지 않습니다
       elasticsearch_health_yellow:
@@ -1168,7 +1187,10 @@ ko:
       body: 새 마스토돈 버전이 릴리스되었습니다. 업데이트 할 수 있습니다!
       subject: "%{instance}에 대해 새 마스토돈 버전이 사용 가능합니다!"
   appearance:
+    advanced_web_interface: 고급 웹 인터페이스
     advanced_web_interface_hint: 화면을 여러 칼럼으로 나눠 보여줍니다.
+    animations_and_accessibility: 애니메이션과 접근성
+    confirmation_dialogs: 확인 대화상자
     discovery: 발견하기
     localization:
       body: 마스토돈은 자원봉사자들에 의해 번역되었습니다.
@@ -1562,7 +1584,7 @@ ko:
     table:
       expires_at: 만료
       uses: 이용 수
-    title: 초대하기
+    title: 초대
   lists:
     errors:
       limit: 리스트 최대 개수를 초과합니다
@@ -1618,7 +1640,7 @@ ko:
     past_migrations: 과거 이주
     proceed_with_move: 팔로워 이동
     redirected_msg: 당신의 계정은 이제 %{acct} 로 리다이렉트됩니다.
-    redirecting_to: 당신의 계정은 %{acct} 로 리다이렉트됩니다.
+    redirecting_to: 내 계정이 %{acct}에 리디렉트됩니다.
     set_redirect: 리디렉션 설정
     warning:
       backreference_required: 새 계정은 이 계정으로 역참조를 하도록 설정되어 있어야 합니다
@@ -1732,7 +1754,7 @@ ko:
       unrecognized_emoji: 인식 되지 않은 에모지입니다
   redirects:
     prompt: 이 링크를 믿을 수 있다면, 클릭해서 계속하세요.
-    title: "%{instance}를 떠나려고 합니다."
+    title: "%{instance}을(를) 떠나려고 합니다."
   relationships:
     activity: 계정 활동
     confirm_follow_selected_followers: 정말로 선택된 팔로워들을 팔로우하시겠습니까?
@@ -1781,7 +1803,7 @@ ko:
     browsers:
       alipay: 알리페이
       blackberry: 블랙베리
-      chrome: 크롬
+      chrome: Chrome
       edge: 마이크로소프트 엣지
       electron: 일렉트론
       firefox: 파이어폭스
@@ -1817,7 +1839,7 @@ ko:
       windows: 윈도우
       windows_mobile: 윈도우 모바일
       windows_phone: 윈도우 폰
-    revoke: 취소
+    revoke: 삭제
     revoke_success: 세션을 성공적으로 취소하였습니다
     title: 로그인 중인 기기
     view_authentication_history: 로그인 기록 보기
@@ -1825,7 +1847,6 @@ ko:
     account: 계정
     account_settings: 계정 설정
     back: 마스토돈으로 돌아가기
-    delete: 계정 삭제
     development: 개발
     export: 데이터 내려받기
     notifications: 알림
@@ -1858,6 +1879,10 @@ ko:
       limit: 이미 너무 많은 게시물을 고정했습니다
       ownership: 다른 사람의 게시물은 고정될 수 없습니다
       reblog: 재게시는 고정될 수 없습니다
+    quote_policies:
+      followers: 팔로워만
+      nobody: 나만
+      public: 누구나
     title: '%{name}: "%{quote}"'
     visibilities:
       direct: DM
@@ -1894,6 +1919,11 @@ ko:
     does_not_match_previous_name: 이전 이름과 맞지 않습니다
   terms_of_service:
     title: 이용 약관
+  terms_of_service_interstitial:
+    future_preamble_html: 이용약관에 몇가지 변경사항이 있으며, <strong>%{date}</strong>부터 효력이 발생합니다. 변경된 약관을 확인하시기 바랍니다.
+    past_preamble_html: 마지막 방문으로부터 이용약관이 변경되었습니다. 변경된 약관을 확인하시기 바랍니다.
+    review_link: 이용 약관 검토하기
+    title: "%{domain} 도메인의 이용 약관에 변경 있음"
   themes:
     default: 마스토돈 (어두움)
     mastodon-light: 마스토돈 (밝음)
@@ -1945,7 +1975,7 @@ ko:
     backup_ready:
       explanation: 마스토돈 계정에 대한 전체 백업을 요청했습니다
       extra: 다운로드 할 준비가 되었습니다!
-      subject: 아카이브를 다운로드할 수 있습니다
+      subject: 다운로드할 아카이의 준비를 마침
       title: 아카이브 테이크아웃
     failed_2fa:
       details: '로그인 시도에 대한 상세 정보입니다:'
@@ -2037,7 +2067,6 @@ ko:
       post_action: 작성
       post_step: 글, 사진, 영상, 또는 투표로 세상에 인사해보세요.
       post_title: 첫번째 게시물 쓰기
-      share_action: 공유
       share_step: 친구에게 마스토돈에서 나를 찾을 수 있는 방법을 알려주세요.
       share_title: 마스토돈 프로필을 공유하세요
       sign_in_action: 로그인

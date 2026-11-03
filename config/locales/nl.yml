@@ -164,7 +164,7 @@ nl:
       undo_silenced: Niet langer beperken
       undo_suspension: Niet langer opschorten
       unsilenced_msg: Het opheffen van de beperkingen van %{username} zijn geslaagd
-      unsubscribe: Opzeggen
+      unsubscribe: Afmelden
       unsuspended_msg: Het niet langer opschorten van %{username} is geslaagd
       username: Gebruikersnaam
       view_domain: Samenvatting voor domein bekijken
@@ -191,6 +191,7 @@ nl:
         create_unavailable_domain: Niet beschikbaar domein aanmaken
         create_user_role: Rol aanmaken
         demote_user: Gebruiker degraderen
+        destroy_account: Accountgegevens Verwijderen
         destroy_announcement: Mededeling verwijderen
         destroy_canonical_email_block: E-mailblokkade verwijderen
         destroy_custom_emoji: Lokale emoji verwijderen
@@ -256,6 +257,7 @@ nl:
         create_unavailable_domain_html: "%{name} heeft de bezorging voor domein %{target} beëindigd"
         create_user_role_html: "%{name} maakte de rol %{target} aan"
         demote_user_html: Gebruiker %{target} is door %{name} gedegradeerd
+        destroy_account_html: "%{name} heeft accountgegevens voor %{target} verwijderd"
         destroy_announcement_html: "%{name} heeft de mededeling %{target} verwijderd"
         destroy_canonical_email_block_html: "%{name} deblokkeerde e-mail met de hash %{target}"
         destroy_custom_emoji_html: "%{name} verwijderde de emoji %{target}"
@@ -578,6 +580,13 @@ nl:
         all: Alles
         limited: Beperkt
         title: Moderatie
+      moderation_notes:
+        create: Moderatie-opmerking aanmaken
+        created_msg: Aanmaken van servermoderatie-opmerking geslaagd!
+        description_html: Opmerkingen bekijken, en voor jezelf en andere moderatoren achterlaten
+        destroyed_msg: Verwijderen van servermoderatie-opmerking geslaagd!
+        placeholder: Informatie over deze server, ondernomen acties of iets anders dat jou kan helpen om deze server in de toekomst te modereren.
+        title: Moderatie-opmerkingen
       private_comment: Privé-opmerking
       public_comment: Openbare opmerking
       purge: Volledig verwijderen
@@ -683,7 +692,7 @@ nl:
         delete: Verwijderen
         placeholder: Beschrijf welke maatregelen zijn genomen of andere gerelateerde opmerkingen...
         title: Opmerkingen
-      notes_description_html: Bekijk en laat opmerkingen achter voor andere moderatoren en voor jouw toekomstige zelf
+      notes_description_html: Opmerkingen bekijken, en voor jezelf en andere moderatoren achterlaten
       processed_msg: 'Rapportage #%{id} succesvol afgehandeld'
       quick_actions_description_html: 'Neem een snelle maatregel of scroll naar beneden om de gerapporteerde inhoud te bekijken:'
       remote_user_placeholder: de externe gebruiker van %{instance}
@@ -694,7 +703,7 @@ nl:
       reported_with_application: Gerapporteerd met applicatie
       resolved: Opgelost
       resolved_msg: Rapportage succesvol opgelost!
-      skip_to_actions: Ga direct naar de maatregelen
+      skip_to_actions: Ga naar de acties
       status: Rapportages
       statuses: Gerapporteerde inhoud
       statuses_description_html: De problematische inhoud wordt aan het gerapporteerde account medegedeeld
@@ -786,17 +795,26 @@ nl:
       title: Rollen
     rules:
       add_new: Regel toevoegen
+      add_translation: Vertaling toevoegen
       delete: Verwijderen
       description_html: Hoewel de meeste mensen zeggen dat ze de gebruiksvoorwaarden hebben gelezen en er mee akkoord gaan, lezen mensen deze meestal niet totdat er een probleem optreedt. <strong>Maak het eenvoudiger om de regels van deze server in één oogopslag te zien, door ze puntsgewijs in een lijst te zetten.</strong> Probeer de verschillende regels kort en simpel te houden, maar probeer ze ook niet in verschillende items onder te verdelen.
       edit: Regel bewerken
       empty: Voor deze server zijn nog geen regels opgesteld.
+      move_down: Omlaag verplaatsen
+      move_up: Omhoog verplaatsen
       title: Serverregels
+      translation: Vertaling
+      translations: Vertalingen
+      translations_explanation: Je kunt eventueel vertalingen toevoegen voor de regels. De standaardwaarde wordt getoond als er geen vertaalde versie beschikbaar is. Zorg er altijd voor dat aanvullende vertalingen bijgewerkt blijven.
     settings:
       about:
         manage_rules: Serverregels beheren
         preamble: Geef uitgebreide informatie over hoe de server wordt beheerd, gemodereerd en gefinancierd.
         rules_hint: Er is een speciaal gebied voor regels waaraan uw gebruikers zich dienen te houden.
         title: Over
+      allow_referrer_origin:
+        desc: Wanneer je gebruikers op links naar externe sites klikken, kan hun browser het adres van jouw Mastodon-server als de referrer verzenden. Zet dit uit als dit jouw gebruikers uniek zou identificeren, bijvoorbeeld als dit een persoonlijke Mastodon-server is.
+        title: Externe sites toestaan om jouw Mastodon-server te zien als de bron
       appearance:
         preamble: Mastodons webomgeving aanpassen.
         title: Weergave
@@ -816,9 +834,9 @@ nl:
       discovery:
         follow_recommendations: Aanbevolen accounts
         preamble: Het tonen van interessante inhoud is van essentieel belang voor het aan boord halen van nieuwe gebruikers, die mogelijk niemand van Mastodon kennen. Bepaal hoe verschillende functies voor het ontdekken van inhoud en gebruikers op jouw server werken.
+        privacy: Privacy
         profile_directory: Gebruikersgids
         public_timelines: Openbare tijdlijnen
-        publish_discovered_servers: Ontdekte servers publiceren
         publish_statistics: Statistieken publiceren
         title: Ontdekken
         trends: Trends
@@ -885,7 +903,7 @@ nl:
       status_title: Bericht van @%{name}
       title: Accountberichten - @%{name}
       trending: Trending
-      view_publicly: In het openbaar bekijken
+      view_publicly: Openbaar bericht bekijken
       visibility: Zichtbaarheid
       with_media: Met media
     strikes:
@@ -958,7 +976,7 @@ nl:
       name: Naam
       newest: Nieuwste
       oldest: Oudste
-      open: In het openbaar bekijken
+      open: Oorspronkelijk bericht bekijken
       reset: Opnieuw
       review: Status beoordelen
       search: Zoeken
@@ -1226,7 +1244,7 @@ nl:
       email_settings_hint_html: Klik op de link die we naar %{email} hebben gestuurd om Mastodon te gebruiken. We wachten wel even.
       link_not_received: Geen link ontvangen?
       new_confirmation_instructions_sent: Je ontvangt binnen enkele minuten een nieuwe e-mail met de bevestigingslink!
-      title: Kijk in je mailbox
+      title: Kijk in je e-mail
     sign_in:
       preamble_html: Log in met de inloggegevens van <strong>%{domain}</strong>. Als jouw account zich op een andere server bevindt, kun je hier niet inloggen.
       title: Inloggen op %{domain}
@@ -1283,9 +1301,11 @@ nl:
   deletes:
     challenge_not_passed: De informatie die u hebt ingevoerd is ongeldig
     confirm_password: Voer jouw huidige wachtwoord in om jouw identiteit te bevestigen
-    confirm_username: Voer uw gebruikersnaam in om de procedure te bevestigen
+    confirm_username: Gebruikersnaam bevestigen
+    confirm_username_hint_html: Typ <code>%{username}</code> om het account dat u wilt verwijderen te bevestigen
     proceed: Account verwijderen
     success_msg: Jouw account is succesvol verwijderd
+    title: Account %{acct} verwijderen
     warning:
       before: 'Lees deze tekst zorgvuldig voordat je verder gaat:'
       caches: Berichten en media die op andere servers zijn opgeslagen kunnen daar achterblijven
@@ -1688,9 +1708,10 @@ nl:
       self_vote: Je kunt niet op eigen peilingen stemmen
       too_few_options: moet meer dan één item bevatten
       too_many_options: kan niet meer dan %{max} items bevatten
+    vote: Stemmen
   preferences:
     other: Overig
-    posting_defaults: Standaardinstellingen voor berichten
+    posting_defaults: Jouw nieuwe berichten
     public_timelines: Openbare tijdlijnen
   privacy:
     hint_html: "<strong>Hoe wil je dat jouw profiel en berichten kunnen worden gevonden?</strong> Een verscheidenheid aan functies in Mastodon kunnen je helpen om een groter publiek te bereiken als ze zijn ingeschakeld. Neem rustig de tijd om deze instellingen te bekijken, om er zo zeker van te zijn dat ze aan jouw wensen voldoen."
@@ -1801,7 +1822,6 @@ nl:
     appearance: Uiterlijk
     authorized_apps: Geautoriseerde apps
     back: Terug naar Mastodon
-    delete: Account verwijderen
     development: Ontwikkelaars
     edit_profile: Profiel bewerken
     export: Exporteren
@@ -1857,8 +1877,8 @@ nl:
       ownership: Een bericht van iemand anders kan niet worden vastgemaakt
       reblog: Een boost kan niet worden vastgezet
     quote_policies:
-      followers: Volgers en vermelde gebruikers
-      nobody: Alleen vermelde gebruikers
+      followers: Alleen volgers
+      nobody: Alleen ik
       public: Iedereen
     title: '%{name}: "%{quote}"'
     visibilities:
@@ -1871,7 +1891,7 @@ nl:
       unlisted_long: Aan iedereen tonen, maar niet op openbare tijdlijnen
   statuses_cleanup:
     enabled: Automatisch oude berichten verwijderen
-    enabled_hint: Verwijder uw berichten automatisch zodra ze een bepaalde leeftijdsgrens bereiken, tenzij ze overeenkomen met een van de onderstaande uitzonderingen
+    enabled_hint: Verwijder jouw berichten automatisch zodra ze een bepaalde leeftijdsgrens bereiken, tenzij ze overeenkomen met een van de onderstaande uitzonderingen
     exceptions: Uitzonderingen
     explanation: Doordat het verwijderen van berichten de server zwaar belast, gebeurt dit geleidelijk aan op momenten dat de server niet bezig is. Om deze reden kunnen uw berichten een tijdje nadat ze de leeftijdsgrens hebben bereikt worden verwijderd.
     ignore_favs: Favorieten negeren
@@ -1913,6 +1933,11 @@ nl:
     does_not_match_previous_name: komt niet overeen met de vorige naam
   terms_of_service:
     title: Gebruiksvoorwaarden
+  terms_of_service_interstitial:
+    future_preamble_html: We brengen enkele wijzigingen aan in onze gebruiksvoorwaarden, die van kracht worden op <strong>%{date}</strong>. We raden je aan om de bijgewerkte voorwaarden door te nemen.
+    past_preamble_html: We hebben onze gebruiksvoorwaarden gewijzigd sinds je laatste bezoek. We raden je aan om de bijgewerkte voorwaarden door te nemen.
+    review_link: De gebruiksvoorwaarden bekijken
+    title: De gebruiksvoorwaarden van %{domain} worden gewijzigd
   themes:
     contrast: Mastodon (hoog contrast)
     default: Mastodon (donker)
@@ -2047,12 +2072,11 @@ nl:
         one: "%{people} persoon in de afgelopen 2 dagen"
         other: "%{people} mensen in de afgelopen 2 dagen"
       hashtags_subtitle: Wat er in de afgelopen 2 dagen is gebeurd verkennen
-      hashtags_title: Populaire hashtags
-      hashtags_view_more: Meer populaire hashtags bekijken
+      hashtags_title: Trending hashtags
+      hashtags_view_more: Meer trending hashtags bekijken
       post_action: Opstellen
       post_step: Zeg hallo tegen de wereld met tekst, foto's, video's of peilingen.
       post_title: Je eerste bericht schrijven
-      share_action: Delen
       share_step: Laat je vrienden weten waar je op Mastodon bent te vinden.
       share_title: Je Mastodonprofiel delen
       sign_in_action: Inloggen

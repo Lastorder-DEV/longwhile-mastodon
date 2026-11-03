@@ -600,6 +600,13 @@ gd:
         all: Na h-uile
         limited: Cuingichte
         title: Maorsainneachd
+      moderation_notes:
+        create: Cuir ris nòta maorsainneachd
+        created_msg: Chaidh nòta maorsainneachd mun ionstans a chruthachadh!
+        description_html: Seall is sgrìobh nòtaichean do mhaoir eile is dhut fhèin san àm ri teachd
+        destroyed_msg: Chaidh nòta maorsainneachd mun ionstans a sguabadh às!
+        placeholder: Fiosrachadh mun ionstans seo, gnìomhan a chaidh a ghabhail no rud sam bith eile a chuidicheas thu le maorsainneachd an ionstans seo san àm ri teachd.
+        title: Nòtaichean na maorsainneachd
       private_comment: Beachd prìobhaideach
       public_comment: Beachd poblach
       purge: Purgaidich
@@ -762,7 +769,7 @@ gd:
         special: Sònraichte
       delete: Sguab às
       description_html: Le <strong>dreuchdan chleachdaichean</strong>, ’s urrainn dhut gnàthachadh dè na gleusan is raointean de Mhastodon as urrainn dha na cleachdaichean agad inntrigeadh.
-      edit: Deasaich an dreuchd aig “%{name}“
+      edit: Deasaich an dreuchd “%{name}“
       everyone: Na ceadan bunaiteach
       everyone_full_description_html: Seo an <strong>dreuchd bhunaiteach</strong> a bheir buaidh air <strong>gach cleachdaiche</strong>, fiù an fheadhainn nach deach dreuchd iomruineadh dhaibh. Gheibh a h-uile dreuch ceadan uaipe mar dhìleab.
       permissions_count:
@@ -814,17 +821,26 @@ gd:
       title: Dreuchdan
     rules:
       add_new: Cuir riaghailt ris
+      add_translation: Cuir eadar-theangachadh ris
       delete: Sguab às
       description_html: Ged a dh’innseas a’ mhòrchuid gun do leugh iad teirmichean na seirbheise is gu bheil iad ag aontachadh riutha, ’s ann mar as trice nach lean daoine orra ’gan leughadh gun deireadh nuair a thachras iad ri duilgheadas. <strong>Dèan e nas fhasa dhaibh gun tuig iad riaghailtean an fhrithealaiche ann am priobadh na sùla is tu a’ toirt liosta peilearaichte dhaibh.</strong> Feuch an cùm thu gach riaghailt goirid is sìmplidh ach feuch nach sgaoil thu ann an iomadh nì iad nas motha.
       edit: Deasaich an riaghailt
       empty: Cha deach riaghailtean an fhrithealaiche a mhìneachadh fhathast.
+      move_down: Gluais sìos
+      move_up: Gluais suas
       title: Riaghailtean an fhrithealaiche
+      translation: Eadar-theangachadh
+      translations: Eadar-theangachaidhean
+      translations_explanation: "’S urrainn dhut na riaghailtean eadar-theangachadh ma thogras tu. Thèid an luach bunaiteach a shealltainn mur eil eadar-theangachadh ann. Dèan cinnteach an-còmhnaidh gur ionnann an t-eadar-theangachadh ’s an luach bunaiteach."
     settings:
       about:
         manage_rules: Stiùirich riaghailtean an fhrithealaiche
         preamble: Solair fiosrachadh domhainn mu sholar, maorsainneachd is maoineachadh an fhrithealaiche seo.
         rules_hint: Tha roinn sònraichte ann dha na riaghailtean air am bu chòir an luchd-cleachdaidh agad a leantainn.
         title: Mu dhèidhinn
+      allow_referrer_origin:
+        desc: Nuair a bhriogas an luchd-cleachdaidh agad ceanglaichean gu làraichean air ann taobh a-muigh, dh’fhaoidte gun cuir am brabhsair aca seòladh an fhrithealaiche Mastodon agad thuca mar an referrer. Cuir seo à comas ma dh’aithnicheadh sin an luchd-cleachdaidh fa leth agad, can mas e frithealaiche Mastodon pearsanta a th’ ann.
+        title: Ceadaich gum faic làraichean air an taobh a-muigh an fhrithealaiche Mastodon agad mar thùs trafaige
       appearance:
         preamble: Gnàthaich eadar-aghaidh-lìn Mhastodon.
         title: Coltas
@@ -844,9 +860,9 @@ gd:
       discovery:
         follow_recommendations: Molaidhean leantainn
         preamble: Tha tighinn an uachdar susbainte inntinniche fìor-chudromach airson toiseach-tòiseachaidh an luchd-cleachdaidh ùr nach eil eòlach air duine sam bith air Mastodon, ma dh’fhaoidte. Stiùirich mar a dh’obraicheas gleusan an rùrachaidh air an fhrithealaiche agad.
+        privacy: Prìobhaideachd
         profile_directory: Eòlaire nam pròifil
         public_timelines: Loidhnichean-ama poblach
-        publish_discovered_servers: Foillsich na frithealaichean a chaidh a rùrachadh
         publish_statistics: Foillsich an stadastaireachd
         title: Rùrachadh
         trends: Treandaichean
@@ -1321,7 +1337,6 @@ gd:
   deletes:
     challenge_not_passed: Chan eil am fiosrachadh a chuir thu a-steach mar bu chòir
     confirm_password: Cuir a-steach am facal-faire làithreach a dhearbhadh cò thusa
-    confirm_username: Cuir a-steach an t-ainm-cleachdaiche agad a dhearbhadh a’ ghnìomha
     proceed: Sguab às an cunntas
     success_msg: Chaidh an cunntas agad a sguabadh às
     warning:
@@ -1519,10 +1534,10 @@ gd:
         other: Tha thu an impis suas ri <strong>%{count} àrainn</strong> o <strong>%{filename}</strong> a chur <strong>an àite liosta nam bacaidhean àrainne</strong> agad.
         two: Tha thu an impis suas ri <strong>%{count} àrainn</strong> o <strong>%{filename}</strong> a chur <strong>an àite liosta nam bacaidhean àrainne</strong> agad.
       following_html:
-        few: Tha thu an impis suas ri <strong>%{count} cunntasan</strong> o <strong>%{filename}</strong> <strong>a leantainn</strong> agus <strong>sguiridh tu a leantainn duine sam bith eile</strong>.
-        one: Tha thu an impis suas ri <strong>%{count} chunntas</strong> o <strong>%{filename}</strong> <strong>a leantainn</strong> agus <strong>sguiridh tu a leantainn duine sam bith eile</strong>.
-        other: Tha thu an impis suas ri <strong>%{count} cunntas</strong> o <strong>%{filename}</strong> <strong>a leantainn</strong> agus <strong>sguiridh tu a leantainn duine sam bith eile</strong>.
-        two: Tha thu an impis suas ri <strong>%{count} chunntas</strong> o <strong>%{filename}</strong> <strong>a leantainn</strong> agus <strong>sguiridh tu a leantainn duine sam bith eile</strong>.
+        few: Tha thu an impis suas ri <strong>%{count} cunntasan</strong> o <strong>%{filename}</strong> <strong>a leantainn</strong> agus <strong>sguiridh tu a leantainn neach sam bith eile</strong>.
+        one: Tha thu an impis suas ri <strong>%{count} chunntas</strong> o <strong>%{filename}</strong> <strong>a leantainn</strong> agus <strong>sguiridh tu a leantainn neach sam bith eile</strong>.
+        other: Tha thu an impis suas ri <strong>%{count} cunntas</strong> o <strong>%{filename}</strong> <strong>a leantainn</strong> agus <strong>sguiridh tu a leantainn neach sam bith eile</strong>.
+        two: Tha thu an impis suas ri <strong>%{count} chunntas</strong> o <strong>%{filename}</strong> <strong>a leantainn</strong> agus <strong>sguiridh tu a leantainn neach sam bith eile</strong>.
       lists_html:
         few: Tha thu an impis susbaint <strong>%{filename}</strong> a chur <strong>an àite nan liostaichean agad</strong>. Thèid suas ri <strong>%{count} cunntasan</strong> a chur ri liostaichean ùra.
         one: Tha thu an impis susbaint <strong>%{filename}</strong> a chur <strong>an àite nan liostaichean agad</strong>. Thèid suas ri <strong>%{count} chunntas</strong> a chur ri liostaichean ùra.
@@ -1766,6 +1781,7 @@ gd:
       self_vote: Chan urrainn dhut bhòtadh sna chunntasan-bheachd agad fhèin
       too_few_options: "– feumaidh iomadh nì a bhith aige"
       too_many_options: "– chan fhaod còrr is %{max} nì a bhith ’na bhroinn"
+    vote: Bhòt
   preferences:
     other: Eile
     posting_defaults: Bun-roghainnean a’ phostaidh
@@ -1879,7 +1895,6 @@ gd:
     appearance: Coltas
     authorized_apps: Aplacaidean ùghdarraichte
     back: Till gu Mastodon
-    delete: Sguabadh às cunntais
     development: Leasachadh
     edit_profile: Deasaich a’ phròifil
     export: Às-phortadh
@@ -1942,9 +1957,13 @@ gd:
       limit: Tha an àireamh as motha de phostaichean prìnichte agad a tha ceadaichte
       ownership: Chan urrainn dhut post càich a phrìneachadh
       reblog: Chan urrainn dhut brosnachadh a phrìneachadh
+    quote_policies:
+      followers: Luchd-leantainn a-mhàin
+      nobody: Mi fhìn a-mhàin
+      public: A h-uile duine
     title: "%{name}: “%{quote}”"
     visibilities:
-      direct: Dìreach
+      direct: Iomradh prìobhaideach
       private: Luchd-leantainn a-mhàin
       private_long: Na seall ach dhan luchd-leantainn
       public: Poblach
@@ -1995,6 +2014,11 @@ gd:
     does_not_match_previous_name: "– chan eil seo a-rèir an ainm roimhe"
   terms_of_service:
     title: Teirmichean na seirbheise
+  terms_of_service_interstitial:
+    future_preamble_html: Tha sinn ag atharrachadh teirmichean na seirbheise againn a bhios èifeachdach on <strong>%{date}</strong> a-mach. Mholamaid gun dèan thu lèirmheas air na teirmichean ùra.
+    past_preamble_html: Dh’atharraich sinn teirmichean na seirbheise againn on turas mu dheireadh a thadhail thu oirnn. Mholamaid gun dèan thu lèirmheas air na teirmichean ùra.
+    review_link: Dèan lèirmheas air teirmichean na seirbheise
+    title: Tha teirmichean na seirbheise aig %{domain} gu bhith atharrachadh
   themes:
     contrast: Mastodon (iomsgaradh àrd)
     default: Mastodon (dorcha)
@@ -2136,7 +2160,6 @@ gd:
       post_action: Sgrìobh
       post_step: Cuir an aithne air an t-saoghal le teacsa, dealbhan, videothan no cunntasan-bheachd.
       post_title: Cruthaich a’ chiad phost agad
-      share_action: Co-roinn
       share_step: Leig fios dha do charaidean mar a gheibh iad grèim ort air Mastodon.
       share_title: Co-roinn a’ phròifil Mastodon agad
       sign_in_action: Clàraich a-steach

@@ -847,7 +847,6 @@ si:
   deletes:
     challenge_not_passed: ඔබ ඇතුල් කරන ලද තොරතුරු වැරදියි
     confirm_password: ඔබගේ අනන්‍යතාවය තහවුරු කිරීමට ඔබගේ වත්මන් මුරපදය ඇතුලත් කරන්න
-    confirm_username: ක්රියා පටිපාටිය තහවුරු කිරීමට ඔබගේ පරිශීලක නාමය ඇතුලත් කරන්න
     proceed: ගිණුම මකන්න
     success_msg: ඔබගේ ගිණුම සාර්ථකව මකා ඇත
     warning:
@@ -1226,7 +1225,6 @@ si:
     appearance: පෙනුම
     authorized_apps: බලයලත් යෙදුම්
     back: මාස්ටඩන් වෙත ආපසු
-    delete: ගිණුම මැකීම
     development: සංවර්ධනය
     edit_profile: පැතිකඩ සංස්කරණය
     featured_tags: විශේෂාංගගත හැෂ් ටැග්
@@ -1266,7 +1264,6 @@ si:
       ownership: වෙනත් අයගේ ලිපි ඇමිණීමට නොහැකිය
     title: '%{name}: "%{quote}"'
     visibilities:
-      direct: සෘජු
       private: අනුගාමිකයින් පමණි
       private_long: අනුගාමිකයින්ට පමණක් පෙන්වන්න
       public: ප්‍රසිද්ධ

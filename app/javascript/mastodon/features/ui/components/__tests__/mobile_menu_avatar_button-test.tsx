@@ -5,7 +5,7 @@ import { importAccounts } from 'mastodon/actions/importer/accounts';
 import { closeNavigation } from 'mastodon/actions/navigation';
 import type { ApiAccountJSON } from 'mastodon/api_types/accounts';
 import { store } from 'mastodon/store';
-import { fireEvent, render, screen } from 'mastodon/test_helpers';
+import { fireEvent, render, screen } from '@/testing/rendering';
 
 import { MobileMenuAvatarButton } from '../mobile_menu_avatar_button';
 

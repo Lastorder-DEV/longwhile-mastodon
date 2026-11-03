@@ -40,7 +40,7 @@ import { fetchDmRooms } from 'mastodon/actions/dm_rooms';
 import { Icon } from 'mastodon/components/icon';
 import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import { WordmarkLogo } from 'mastodon/components/logo';
-import { NavigationPortal } from 'mastodon/components/navigation_portal';
+import { Trends } from 'mastodon/features/getting_started/components/trends';
 import { identityContextPropShape, withIdentity } from 'mastodon/identity_context';
 import { timelinePreview, trendsEnabled, dmChatEnabled } from 'mastodon/initial_state';
 import { canManageDirectMessages } from 'mastodon/permissions';
@@ -387,7 +387,7 @@ class NavigationPanel extends Component {
 
         </div>
 
-        <NavigationPortal />
+        <Trends />
       </div>
     );
   }

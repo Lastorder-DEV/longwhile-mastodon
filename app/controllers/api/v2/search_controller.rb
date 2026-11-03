@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Api::V2::SearchController < Api::BaseController
+  include AsyncRefreshesConcern
   include Authorization
 
   RESULTS_LIMIT = 20
@@ -16,6 +17,7 @@ class Api::V2::SearchController < Api::BaseController
     before_action :remote_resolve_error, if: :remote_resolve_requested?
   end
   before_action :require_valid_pagination_options!
+  before_action :handle_fasp_requests
 
   def index
     @search = Search.new(search_results)
@@ -87,6 +89,21 @@ class Api::V2::SearchController < Api::BaseController
     }, status: 401
   end
 
+  def handle_fasp_requests
+    return unless Mastodon::Feature.fasp_enabled?
+    return if params[:q].blank?
+
+    # Do not schedule a new retrieval if the request is a follow-up
+    # to an earlier retrieval
+    return if request.headers['Mastodon-Async-Refresh-Id'].present?
+
+    refresh_key = "fasp:account_search:#{Digest::MD5.base64digest(params[:q])}"
+    return if AsyncRefresh.new(refresh_key).running?
+
+    add_async_refresh_header(AsyncRefresh.create(refresh_key))
+    @query_fasp = true
+  end
+
   def remote_resolve_requested?
     truthy_param?(:resolve)
   end
@@ -111,7 +128,8 @@ class Api::V2::SearchController < Api::BaseController
     base_params = search_params.merge(
       resolve: truthy_param?(:resolve),
       exclude_unreviewed: truthy_param?(:exclude_unreviewed),
-      following: truthy_param?(:following)
+      following: truthy_param?(:following),
+      query_fasp: @query_fasp
     )
 
     # 한국어 검색 최적화 파라미터 추가

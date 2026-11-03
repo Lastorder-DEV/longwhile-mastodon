@@ -180,7 +180,7 @@ sv:
         change_role_user: Ändra roll för användaren
         confirm_user: Bekräfta användare
         create_account_warning: Skapa varning
-        create_announcement: Skapa kungörelse
+        create_announcement: Skapa notis
         create_canonical_email_block: Skapa E-post block
         create_custom_emoji: Skapa egen emoji
         create_domain_allow: Skapa tillåten domän
@@ -191,7 +191,8 @@ sv:
         create_unavailable_domain: Skapa otillgänglig domän
         create_user_role: Skapa roll
         demote_user: Degradera användare
-        destroy_announcement: Radera kungörelse
+        destroy_account: Radera kontodata
+        destroy_announcement: Radera notis
         destroy_canonical_email_block: Ta bort e-post block
         destroy_custom_emoji: Radera egen emoji
         destroy_domain_allow: Ta bort tillåten domän
@@ -230,7 +231,7 @@ sv:
         unsensitive_account: Ångra tvinga känsligt konto
         unsilence_account: Ångra begränsa konto
         unsuspend_account: Ångra avstängning av konto
-        update_announcement: Uppdatera kungörelse
+        update_announcement: Uppdatera notis
         update_custom_emoji: Uppdatera egna emojis
         update_domain_block: Uppdatera blockerad domän
         update_ip_block: Uppdatera IP-regel
@@ -256,6 +257,7 @@ sv:
         create_unavailable_domain_html: "%{name} stoppade leverans till domänen %{target}"
         create_user_role_html: "%{name} skapade rollen %{target}"
         demote_user_html: "%{name} nedgraderade användare %{target}"
+        destroy_account_html: "%{name} raderade kontodata för %{target}"
         destroy_announcement_html: "%{name} raderade kungörelsen %{target}"
         destroy_canonical_email_block_html: "%{name} avblockerade e-post med hash%{target}"
         destroy_custom_emoji_html: "%{name} raderade emoji %{target}"
@@ -309,6 +311,7 @@ sv:
       title: Revisionslogg
       unavailable_instance: "(domännamn inte tillgängligt)"
     announcements:
+      back: Tillbaka till anslagstavlan
       destroyed_msg: Kungörelsen raderades!
       edit:
         title: Redigera kungörelse
@@ -317,6 +320,10 @@ sv:
       new:
         create: Skapa kungörelse
         title: Ny kungörelse
+      preview:
+        disclaimer: Eftersom användare inte kan välja bort dem bör, e-postmeddelanden begränsas till viktiga meddelanden som personuppgiftsincidenter och meddelanden om stängning ned servern.
+        explanation_html: 'E-postmeddelandet kommer att skickas till <strong>%{display_count} användare</strong>. Följande text kommer att inkluderas i meddelandet:'
+        title: Förhandsgranska notifikation
       publish: Publicera
       published_msg: Publicerade kungörelsen!
       scheduled_for: Schemalagd till %{time}
@@ -478,16 +485,33 @@ sv:
     fasp:
       debug:
         callbacks:
+          created_at: Skapad den
+          delete: Radera
           ip: IP-adress
+          request_body: Förfrågans innehåll
+          title: Felsök återanrop
       providers:
+        active: Aktiv
         base_url: Bas-URL
+        callback: Återanrop
         delete: Ta bort
+        edit: Redigera leverantör
         finish_registration: Slutför registrering
         name: Namn
+        providers: Leverantörer
+        public_key_fingerprint: Fingeravtryck för offentlig nyckel
+        registration_requested: Registrering begärd
         registrations:
           confirm: Bekräfta
+          description: Du fick en registrering från en FASP. Avvisa den om du inte initierade detta. Om du initierat detta, jämför noggrant namn och nyckelns fingeravtryck innan du bekräftar registreringen.
           reject: Avvisa
+          title: Bekräfta registrering av FASP
         save: Spara
+        select_capabilities: Välj funktioner
+        sign_in: Logga in
+        status: Status
+        title: Fediverse Auxiliary Service Providers
+      title: FASP
     follow_recommendations:
       description_html: "<strong>Följrekommendationer hjälper nya användare att snabbt hitta intressant innehåll</strong>. När en användare inte har interagerat med andra tillräckligt mycket för att forma personliga följrekommendationer, rekommenderas istället dessa konton. De beräknas om varje dag från en mix av konton med nylig aktivitet och högst antal följare för ett givet språk."
       language: För språket
@@ -556,6 +580,13 @@ sv:
         all: Alla
         limited: Begränsad
         title: Moderering
+      moderation_notes:
+        create: Lägg till anteckning för modereringen
+        created_msg: Skapandet av anteckningen för modereringen av den här instansen lyckades!
+        description_html: Visa och lämna anteckningar för andra moderatorer och ditt framtida jag
+        destroyed_msg: Borttagningen av anteckningen för modereringen av instansen lyckades!
+        placeholder: Information om den här instansen, åtgärder som har vidtagits eller något annat som kommer att hjälpa dig att moderera den här instansen i framtiden.
+        title: Anteckningar för modereringen
       private_comment: Privat kommentar
       public_comment: Offentlig kommentar
       purge: Rensa
@@ -764,17 +795,26 @@ sv:
       title: Roller
     rules:
       add_new: Lägg till regel
+      add_translation: Lägg till översättning
       delete: Radera
       description_html: Även om de flesta hävdar att de samtycker till tjänstevillkoren, läser folk ofta inte igenom dem förrän det uppstår problem. <strong>Gör dina serverregler mer lättöverskådliga genom att tillhandahålla dem i en enkel punktlista.</strong> Försök att hålla enskilda regler korta och koncisa utan att samtidigt separera dem till för många enskilda punkter.
       edit: Ändra regel
       empty: Inga serverregler har ännu angetts.
+      move_down: Flytta ned
+      move_up: Flytta upp
       title: Serverns regler
+      translation: Översättning
+      translations: Översättningar
+      translations_explanation: Du kan eventuellt lägga till översättningar av reglerna. Standardvärdet kommer att visas om ingen översatt version är tillgänglig. Se alltid till att alla angivna översättningar är i synk med standardvärdet.
     settings:
       about:
         manage_rules: Hantera serverregler
         preamble: Ange fördjupad information om hur servern driftas, modereras och finansieras.
         rules_hint: Det finns ett dedikerat ställe för regler som användarna förväntas följa.
         title: Om
+      allow_referrer_origin:
+        desc: När dina användare klickar på länkar till externa webbplatser, kan deras webbläsare skicka adressen till din Mastodon-server som referent. Inaktivera detta skulle kunna identifiera dina användare, t.ex. om detta är en personlig Mastodon-server.
+        title: Tillåt externa webbplatser att se din Mastodon-server som en trafikkälla
       appearance:
         preamble: Anpassa Mastodons webbgränssnitt.
         title: Utseende
@@ -794,9 +834,9 @@ sv:
       discovery:
         follow_recommendations: Följrekommendationer
         preamble: Att visa intressant innehåll är avgörande i onboarding av nya användare som kanske inte känner någon på Mastodon. Styr hur olika upptäcktsfunktioner fungerar på din server.
+        privacy: Integritet
         profile_directory: Profilkatalog
         public_timelines: Offentliga tidslinjer
-        publish_discovered_servers: Publicera upptäckta servrar
         publish_statistics: Publicera statistik
         title: Upptäck
         trends: Trender
@@ -881,6 +921,8 @@ sv:
     system_checks:
       database_schema_check:
         message_html: Det finns väntande databasmigreringar. Vänligen kör dem för att säkerställa att programmet beter sig som förväntat
+      elasticsearch_analysis_index_mismatch:
+        message_html: Inställningarna för indexanalys med elastisk sökning är inte uppdaterade. Var god kör <code>tootctl search deploy --only-mapping --only=%{value}</code>
       elasticsearch_health_red:
         message_html: Elasticsearch kluster är ohälsosamt (röd status), sökfunktioner är otillgängliga
       elasticsearch_health_yellow:
@@ -952,6 +994,7 @@ sv:
         chance_to_review_html: "<strong>De genererade villkoren för tjänsten kommer inte att publiceras automatiskt.</strong> Du kommer att ha en chans att granska resultatet. Vänligen fyll i nödvändig information för att fortsätta."
         explanation_html: Användarvillkorsmallen tillhandahålls endast i informationssyfte, och skall inte tolkas som juridisk rådgivning i något ämne. Rådgör med ditt eget juridiska ombud om din situation och specifika juridiska frågor du har.
         title: Inställningar för användarvillkor
+      going_live_on_html: Live, gäller %{date}
       history: Historik
       live: Aktuella
       no_history: Det finns inga sparade ändringar i användarvillkoren ännu.
@@ -1010,7 +1053,7 @@ sv:
         confirm_allow_account: Är du säker på att du vill tillåta valda konton?
         confirm_disallow: Är du säker på att du vill förbjuda valda statusar?
         confirm_disallow_account: Är du säker på att du vill förbjuda valda konton?
-        description_html: Detta är inlägg som din server vet om som för närvarande delas och favoriseras mycket just nu. Det kan hjälpa dina nya och återvändande användare att hitta fler människor att följa. Inga inlägg visas offentligt förrän du godkänner författaren, och författaren tillåter att deras konto föreslås till andra. Du kan också tillåta eller avvisa enskilda inlägg.
+        description_html: Detta är inlägg som din server vet om som för närvarande delas och favoritmarkeras mycket just nu. Det kan hjälpa dina nya och återvändande användare att hitta fler människor att följa. Inga inlägg visas offentligt förrän du godkänner författaren, och författaren tillåter att deras konto föreslås till andra. Du kan också tillåta eller avvisa enskilda inlägg.
         disallow: Tillåt inte inlägg
         disallow_account: Tillåt inte författare
         no_status_selected: Inga trendande inlägg ändrades eftersom inga valdes
@@ -1258,9 +1301,11 @@ sv:
   deletes:
     challenge_not_passed: Informationen som du angav var inte korrekt
     confirm_password: Ange ditt lösenord för att verifiera din identitet
-    confirm_username: Fyll i ditt användarnamn för att bekräfta proceduren
+    confirm_username: Bekräfta användarnamn
+    confirm_username_hint_html: Vänligen skriv <code>%{username}</code> för att bekräfta det konto du vill ta bort
     proceed: Radera konto
     success_msg: Ditt konto har raderats
+    title: Ta bort konto %{acct}
     warning:
       before: 'Läs dessa noteringar noga innan du fortsätter:'
       caches: Innehåll som har cachats av andra servrar kan bibehållas
@@ -1320,7 +1365,7 @@ sv:
       content: Vi är ledsna, men något gick fel från vårat håll.
       title: Den här sidan är inte korrekt
     '503': Sidan kunde inte visas på grund av ett tillfälligt serverfel.
-    noscript_html: För att använda Mastodon webbapplikationen, vänligen aktivera JavaScript. Alternativt kan du prova en av <a href="%{apps_path}">inhemska appar</a> för Mastodon för din plattform.
+    noscript_html: Aktivera JavaScript för att använda Mastodons webbapplikation. Alternativt kan du prova någon av Mastodons <a href="%{apps_path}">plattformsspecifika appar</a> för din plattform.
   existing_username_validator:
     not_found: kunde inte hitta en lokal användare med det användarnamnet
     not_found_multiple: kunde inte hitta %{usernames}
@@ -1536,18 +1581,18 @@ sv:
       confirmation_html: Är du säker på att du vill avregistrera dig från att ta emot %{type} för Mastodon på %{domain} med din e-post på %{email}? Du kan alltid återprenumerera bland dina <a href="%{settings_path}">e-postmeddelandeinställningar</a>.
       emails:
         notification_emails:
-          favourite: aviseringsmejl för favoriserade inlägg
+          favourite: aviseringsmejl om favoriter
           follow: aviseringsmejl för följda inlägg
           follow_request: aviseringsmejl för följdförfrågningar
           mention: aviseringsmejl för inlägg där du nämns
-          reblog: aviseringsmejl för förhöjda inlägg
+          reblog: aviseringsmejl om boostar
       resubscribe_html: Om du slutat prenumerera av misstag kan du återprenumerera i dina <a href="%{settings_path}">e-postaviseringsinställningar</a>.
       success_html: Du får inte längre %{type} för Mastodon på %{domain} till din e-post på %{email}.
       title: Avsluta prenumeration
   media_attachments:
     validations:
       images_and_video: Det går inte att bifoga en video till ett inlägg som redan innehåller bilder
-      not_found: Media %{ids} hittades inte eller är redan anslutet till ett annat inlägg
+      not_found: Media %{ids} hittades inte eller har redan bifogats till ett annat inlägg
       not_ready: Kan inte bifoga filer som inte har behandlats färdigt. Försök igen om ett ögonblick!
       too_many: Det går inte att bifoga mer än 4 filer
   migrations:
@@ -1642,7 +1687,7 @@ sv:
     description_html: Om du aktiverar <strong>tvåfaktorsautentisering</strong> med en autentiseringsapp kommer du behöva din mobiltelefon för att logga in, som kommer generera koder för dig att ange.
     enable: Aktivera
     instructions_html: "<strong>Skanna den här QR-koden i Google Authenticator eller en liknande TOTP-app i din telefon</strong>. Från och med nu så kommer den appen att generera symboler som du måste skriva in när du ska logga in."
-    manual_instructions: 'Om du inte kan skanna QR-koden och istället behöver skriva in nyckeln i oformatterad text, finns den här:'
+    manual_instructions: 'Om du inte kan skanna QR-koden och behöver ange den manuellt finns klartextnyckeln här:'
     setup: Konfigurera
     wrong_code: Den ifyllda koden är ogiltig! Är server-tiden och enhetens tid korrekt?
   pagination:
@@ -1663,6 +1708,7 @@ sv:
       self_vote: Du kan inte rösta i dina egna omröstningar
       too_few_options: måste ha mer än ett objekt
       too_many_options: kan inte innehålla mer än %{max} objekt
+    vote: Rösta
   preferences:
     other: Annat
     posting_defaults: Standardinställningar för inlägg
@@ -1776,10 +1822,9 @@ sv:
     appearance: Utseende
     authorized_apps: Godkända appar
     back: Tillbaka till Mastodon
-    delete: Konto radering
     development: Utveckling
     edit_profile: Redigera profil
-    export: Export
+    export: Exportera
     featured_tags: Utvalda hashtaggar
     import: Importera
     import_and_export: Import och export
@@ -1831,9 +1876,13 @@ sv:
       limit: Du har redan fäst det maximala antalet inlägg
       ownership: Någon annans inlägg kan inte fästas
       reblog: En boost kan inte fästas
+    quote_policies:
+      followers: Endast följare
+      nobody: Bara jag
+      public: Alla
     title: '%{name}: "%{quote}"'
     visibilities:
-      direct: Direkt
+      direct: Privat omnämnande
       private: Endast följare
       private_long: Visa endast till följare
       public: Offentlig
@@ -1848,7 +1897,7 @@ sv:
     ignore_favs: Bortse från favoriter
     ignore_reblogs: Ignorera boostar
     interaction_exceptions: Undantag baserat på interaktioner
-    interaction_exceptions_explanation: Observera att det inte finns någon garanti att inlägg blir raderade om de går under favorit- eller boost-tröskeln efter att en gång ha gått över dem.
+    interaction_exceptions_explanation: Observera att det inte finns någon garanti att inlägg blir raderade om de går under favorit- eller boosttröskeln efter att en gång ha gått över dem.
     keep_direct: Behåll direktmeddelanden
     keep_direct_hint: Tar inte bort någon av dina direktmeddelanden
     keep_media: Behåll inlägg med mediebilagor
@@ -1884,9 +1933,14 @@ sv:
     does_not_match_previous_name: matchar inte det föregående namnet
   terms_of_service:
     title: Användarvillkor
+  terms_of_service_interstitial:
+    future_preamble_html: Vi gör några ändringar i våra användarvillkor som kommer att vara gäller från och med <strong>%{date}</strong>. Vi uppmanar dig att granska de uppdaterade villkoren.
+    past_preamble_html: Vi har ändrat våra användarvillkor sedan ditt senaste besök. Vi uppmanar dig att granska de uppdaterade villkoren.
+    review_link: Granska villkoren för tjänsten
+    title: Villkoren för tjänsten i %{domain} ändras
   themes:
-    contrast: Mastodon (Hög kontrast)
-    default: Mastodon (Mörk)
+    contrast: Mastodon (hög kontrast)
+    default: Mastodon (mörkt)
     mastodon-light: Mastodon (ljust)
     system: Automatisk (använd systemtema)
   time:
@@ -1915,6 +1969,10 @@ sv:
     recovery_instructions_html: Om du någonsin tappar åtkomst till din telefon kan du använda någon av återställningskoderna nedan för att återställa åtkomst till ditt konto. <strong> Håll återställningskoderna säkra </strong>. Du kan till exempel skriva ut dem och lagra dem med andra viktiga dokument.
     webauthn: Säkerhetsnycklar
   user_mailer:
+    announcement_published:
+      description: 'Administratörerna på %{domain} gör ett tillkännagivande:'
+      subject: Tjänstkungörelse
+      title: Kungörelser från %{domain}
     appeal_approved:
       action: Kontoinställningar
       explanation: Överklagandet du skickade in den %{appeal_date} för pricken på ditt konto den %{strike_date} har godkänts. Ditt konto har återigen bra anseende.
@@ -1947,6 +2005,8 @@ sv:
     terms_of_service_changed:
       agreement: Genom att fortsätta använda %{domain} godkänner du dessa villkor. Om du inte håller med om de uppdaterade villkoren kan du när som helst säga upp ditt avtal med %{domain} genom att radera ditt konto.
       changelog: 'I korthet, här är vad denna uppdatering innebär för dig:'
+      description: 'Du får det här e-postmeddelandet eftersom att vi gör vissa ändringar i våra användarvillkor för %{domain}. De här uppdateringarna kommer att börja gälla %{date}. Vi uppmuntrar dig att granska de uppdaterade villkoren här i sin helhet:'
+      description_html: Du får det här e-postmeddelandet eftersom att vi gör några ändringar till våra användningsvillkor för %{domain}. De här uppdateringarna kommer att börja gälla från <strong>%{date}</strong>. Vi uppmuntrar dig att granska de uppdaterade villkoren i sin helhet <a href="%{path}" target="_blank">här</a>.
       sign_off: "%{domain} teamet"
       subject: Uppdateringar till våra användarvillkor
       subtitle: Villkoren för tjänsten på %{domain} ändras
@@ -2017,7 +2077,6 @@ sv:
       post_action: Skriv
       post_step: Säg hej till världen med text, foton, videor eller omröstningar.
       post_title: Skapa ditt första inlägg
-      share_action: Dela
       share_step: Låt dina vänner veta hur de hittar dig på Mastodon.
       share_title: Dela din Mastodon-profil
       sign_in_action: Logga in
@@ -2032,7 +2091,7 @@ sv:
     seamless_external_login: Du är inloggad via en extern tjänst. Därför finns inställningar för lösenord och e-post inte tillgängliga.
     signed_in_as: 'Inloggad som:'
   verification:
-    extra_instructions_html: <strong>Tips:</strong> Länken på din webbplats kan vara osynlig. Den viktiga delen är <code>rel="me"</code> som förhindrar personifiering på webbplatser med användargenererat innehåll. Du kan även använda en <code>länk</code> tagg i huvudet på sidan istället för <code>en</code>, men HTML:en måste vara tillgänglig utan att exekvera JavaScript.
+    extra_instructions_html: <strong>Tips:</strong> Länken på din webbplats kan vara osynlig. Den viktiga delen är <code>rel="me"</code>, som förhindrar personifiering på webbplatser med användargenererat innehåll. Du kan även använda en <code>link</code>-tagg i sidhuvudet i stället för <code>a</code>, men HTML-koden måste vara tillgänglig utan att JavaScript körs.
     here_is_how: Så här gör du
     hint_html: "<strong>Verifiera din identitet på Mastodon är för alla.</strong> Baserat på öppna webbstandarder, nu och för evigt fria. Allt du behöver är en personlig webbplats som folk känner igen dig med. När du länkar till denna webbplats från din profil kommer vi att kontrollera att webbplatsen länkar tillbaka till din profil och visa en visuell indikator på den."
     instructions_html: Kopiera och klistra in koden nedan in i HTML-koden på din webbplats. Lägg sedan till adressen till din webbplats i ett av de extra fälten på din profil från fliken "Redigera profil" och spara ändringar.

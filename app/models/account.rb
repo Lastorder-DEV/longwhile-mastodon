@@ -84,6 +84,13 @@ class Account < ApplicationRecord
   DISPLAY_NAME_LENGTH_LIMIT = 30
   NOTE_LENGTH_LIMIT = 500
 
+  # Hard limits for federated content
+  USERNAME_LENGTH_HARD_LIMIT = 2048
+  DISPLAY_NAME_LENGTH_HARD_LIMIT = 2048
+  NOTE_LENGTH_HARD_LIMIT = 20.kilobytes
+  ATTRIBUTION_DOMAINS_HARD_LIMIT = 256
+  ALSO_KNOWN_AS_HARD_LIMIT = 256
+
   AUTOMATED_ACTOR_TYPES = %w(Application Service).freeze
 
   include Attachmentable # Load prior to Avatar & Header concerns
@@ -95,6 +102,7 @@ class Account < ApplicationRecord
   include Account::FinderConcern
   include Account::Header
   include Account::Interactions
+  include Account::Mappings
   include Account::Merging
   include Account::Search
   include Account::Sensitizes
@@ -115,7 +123,7 @@ class Account < ApplicationRecord
   validates_with UniqueUsernameValidator, if: -> { will_save_change_to_username? }
 
   # Remote user validations, also applies to internal actors
-  validates :username, format: { with: USERNAME_ONLY_RE }, if: -> { (remote? || actor_type_application?) && will_save_change_to_username? }
+  validates :username, format: { with: USERNAME_ONLY_RE }, length: { maximum: USERNAME_LENGTH_HARD_LIMIT }, if: -> { (remote? || actor_type_application?) && will_save_change_to_username? }
 
   # Remote user validations
   validates :uri, presence: true, unless: :local?, on: :create
@@ -144,10 +152,7 @@ class Account < ApplicationRecord
   scope :partitioned, -> { order(Arel.sql('row_number() over (partition by domain)')) }
   scope :without_instance_actor, -> { where.not(id: INSTANCE_ACTOR_ID) }
   scope :recent, -> { reorder(id: :desc) }
-  scope :bots, -> { where(actor_type: AUTOMATED_ACTOR_TYPES) }
   scope :non_automated, -> { where.not(actor_type: AUTOMATED_ACTOR_TYPES) }
-  scope :groups, -> { where(actor_type: 'Group') }
-  scope :alphabetic, -> { order(domain: :asc, username: :asc) }
   scope :matches_uri_prefix, ->(value) { where(arel_table[:uri].matches("#{sanitize_sql_like(value)}/%", false, true)).or(where(uri: value)) }
   scope :matches_username, ->(value) { where('lower((username)::text) LIKE lower(?)', "#{value}%") }
   scope :matches_display_name, ->(value) { where(arel_table[:display_name].matches("#{value}%")) }
@@ -169,6 +174,7 @@ class Account < ApplicationRecord
   after_update_commit :trigger_update_webhooks
 
   delegate :email,
+           :email_domain,
            :unconfirmed_email,
            :current_sign_in_at,
            :created_at,

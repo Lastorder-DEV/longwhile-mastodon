@@ -11,17 +11,6 @@ RSpec.describe User do
 
   it_behaves_like 'two_factor_backupable'
 
-  describe 'legacy_otp_secret' do
-    it 'is encrypted with OTP_SECRET environment variable' do
-      user = Fabricate(:user,
-                       encrypted_otp_secret: "Fttsy7QAa0edaDfdfSz094rRLAxc8cJweDQ4BsWH/zozcdVA8o9GLqcKhn2b\nGi/V\n",
-                       encrypted_otp_secret_iv: 'rys3THICkr60BoWC',
-                       encrypted_otp_secret_salt: '_LMkAGvdg7a+sDIKjI3mR2Q==')
-
-      expect(user.send(:legacy_otp_secret)).to eq 'anotpsecretthatshouldbeencrypted'
-    end
-  end
-
   describe 'otp_secret' do
     it 'encrypts the saved value' do
       user = Fabricate(:user, otp_secret: '123123123')
@@ -174,6 +163,34 @@ RSpec.describe User do
       user = described_class.new(email: 'foo@mvrht.com.topdomain.tld', account: account, password: password, agreement: true)
 
       expect(user).to_not be_valid
+    end
+  end
+
+  describe '#email_domain' do
+    subject { described_class.new(email: email).email_domain }
+
+    context 'when value is nil' do
+      let(:email) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when value is blank' do
+      let(:email) { '' }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when value has valid domain' do
+      let(:email) { 'user@host.example' }
+
+      it { is_expected.to eq('host.example') }
+    end
+
+    context 'when value has no split' do
+      let(:email) { 'user$host.example' }
+
+      it { is_expected.to be_nil }
     end
   end
 
@@ -459,12 +476,15 @@ RSpec.describe User do
 
     let(:current_sign_in_at) { Time.zone.now }
 
-    before do
-      user.disable!
-    end
-
     it 'disables user' do
+      allow(redis).to receive(:publish)
+
+      user.disable!
+
       expect(user).to have_attributes(disabled: true)
+
+      expect(redis)
+        .to have_received(:publish).with("timeline:system:#{user.account.id}", Oj.dump(event: :kill)).once
     end
   end
 
@@ -489,7 +509,7 @@ RSpec.describe User do
     let!(:access_token) { Fabricate(:access_token, resource_owner_id: user.id) }
     let!(:web_push_subscription) { Fabricate(:web_push_subscription, access_token: access_token) }
 
-    let(:redis_pipeline_stub) { instance_double(Redis::Namespace, publish: nil) }
+    let(:redis_pipeline_stub) { instance_double(Redis::PipelinedConnection, publish: nil) }
 
     before { stub_redis }
 
@@ -541,7 +561,7 @@ RSpec.describe User do
                 long_lived: true,
                 revoked_at: nil)
     end
-    let(:redis_pipeline_stub) { instance_double(Redis::Namespace, publish: nil) }
+    let(:redis_pipeline_stub) { instance_double(Redis, publish: nil) }
 
     before do
       allow(redis).to receive(:pipelined).and_yield(redis_pipeline_stub)
@@ -571,8 +591,8 @@ RSpec.describe User do
         expect(standard_token.reload.revoked_at).to be_present
         expect(long_lived_refresh_token.reload.revoked_at).to be_nil
         expect(redis_pipeline_stub).to have_received(:publish).with("timeline:access_token:#{standard_token.id}", Oj.dump(event: :kill))
-        expect(redis_pipeline_stub).not_to have_received(:publish).with("timeline:access_token:#{multi_account_token.id}", anything)
-        expect(redis_pipeline_stub).not_to have_received(:publish).with("timeline:access_token:#{long_lived_refresh_token.id}", anything)
+        expect(redis_pipeline_stub).to_not have_received(:publish).with("timeline:access_token:#{multi_account_token.id}", anything)
+        expect(redis_pipeline_stub).to_not have_received(:publish).with("timeline:access_token:#{long_lived_refresh_token.id}", anything)
       end
     end
   end

@@ -84,8 +84,6 @@ export const MODAL_COMPONENTS = {
   'REPLY_RECIPIENTS': ReplyRecipientsModal,
 };
 
-const SCROLL_UNLOCKED_MODALS = ['SCHEDULE'];
-
 export default class ModalRoot extends PureComponent {
 
   static propTypes = {
@@ -98,18 +96,6 @@ export default class ModalRoot extends PureComponent {
   state = {
     backgroundColor: null,
   };
-
-  getSnapshotBeforeUpdate () {
-    return { visible: !!this.props.type && !SCROLL_UNLOCKED_MODALS.includes(this.props.type) };
-  }
-
-  componentDidUpdate (prevProps, prevState, { visible }) {
-    if (visible) {
-      document.body.classList.add('with-modals--active');
-    } else {
-      document.body.classList.remove('with-modals--active');
-    }
-  }
 
   setBackgroundColor = color => {
     this.setState({ backgroundColor: color });

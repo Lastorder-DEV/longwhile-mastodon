@@ -249,7 +249,7 @@ const withReplyMentions = (state, text) => {
   return `${mentions.map(acct => `@${acct}`).join(' ')} ${text}`;
 };
 
-export function submitCompose() {
+export function submitCompose(successCallback) {
   return function (dispatch, getState) {
     const text     = getState().getIn(['compose', 'text'], '');
     const status   = withReplyMentions(getState(), text);
@@ -314,6 +314,9 @@ export function submitCompose() {
 
       dispatch(insertIntoTagHistory(response.data.tags, status));
       dispatch(submitComposeSuccess({ ...response.data }));
+      if (typeof successCallback === 'function') {
+        successCallback(response.data);
+      }
 
       // To make the app more responsive, immediately push the status
       // into the columns

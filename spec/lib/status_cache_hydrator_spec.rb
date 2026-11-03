@@ -50,19 +50,96 @@ RSpec.describe StatusCacheHydrator do
         it 'renders the same attributes as full render' do
           expect(subject).to eql(compare_to_hash)
           expect(subject[:quote]).to_not be_nil
+          expect(subject[:quote_status]).to be_nil
         end
       end
 
       context 'when handling an approved quote' do
         let(:quoted_status) { Fabricate(:status) }
+        let(:legacy) { false }
 
         before do
-          Fabricate(:quote, status: status, quoted_status: quoted_status, state: :accepted)
+          Fabricate(:quote, status: status, quoted_status: quoted_status, state: :accepted, legacy: legacy)
         end
 
         it 'renders the same attributes as full render' do
           expect(subject).to eql(compare_to_hash)
           expect(subject[:quote]).to_not be_nil
+        end
+
+        context 'when the quote post is recursive' do
+          let(:quoted_status) { status }
+
+          it 'renders the same attributes as full render' do
+            expect(subject).to eql(compare_to_hash)
+            expect(subject[:quote]).to_not be_nil
+          end
+        end
+
+        context 'when the quote post is a legacy quote' do
+          let(:legacy) { true }
+
+          it 'renders the same attributes as full render' do
+            expect(subject).to eql(compare_to_hash)
+            expect(subject[:quote]).to_not be_nil
+          end
+        end
+
+        context 'when the quoted post is a private post the viewer is not authorized to see' do
+          let(:quoted_status) { Fabricate(:status, account: status.account, visibility: :private) }
+
+          it 'renders the same attributes as full render' do
+            expect(subject).to eql(compare_to_hash)
+            expect(subject[:quote]).to_not be_nil
+            expect(subject[:quote][:quoted_status]).to be_nil
+          end
+        end
+
+        context 'when the quoted post is a private post the viewer is authorized to see' do
+          let(:quoted_status) { Fabricate(:status, account: status.account, visibility: :private) }
+
+          before do
+            account.follow!(quoted_status.account)
+          end
+
+          it 'renders the same attributes as full render' do
+            expect(subject).to eql(compare_to_hash)
+            expect(subject[:quote]).to_not be_nil
+            expect(subject[:quote][:quoted_status]).to_not be_nil
+          end
+        end
+
+        context 'when the quoted post has been deleted' do
+          let(:quoted_status) { nil }
+
+          it 'returns the same attributes as full render' do
+            expect(subject).to eql(compare_to_hash)
+            expect(subject[:quote]).to_not be_nil
+            expect(subject[:quote][:quoted_status]).to be_nil
+          end
+        end
+
+        context 'when the quoted post author has blocked the viewer' do
+          before do
+            quoted_status.account.block!(account)
+          end
+
+          it 'returns the same attributes as full render' do
+            expect(subject).to eql(compare_to_hash)
+            expect(subject[:quote]).to_not be_nil
+            expect(subject[:quote][:quoted_status]).to be_nil
+          end
+        end
+
+        context 'when the viewer has blocked the quoted post author' do
+          before do
+            account.block!(quoted_status.account)
+          end
+
+          it 'returns the same attributes as full render' do
+            expect(subject).to eql(compare_to_hash)
+            expect(subject[:quote]).to_not be_nil
+          end
         end
 
         context 'when the quoted post has been favourited' do
@@ -84,6 +161,28 @@ RSpec.describe StatusCacheHydrator do
           it 'renders the same attributes as full render' do
             expect(subject).to eql(compare_to_hash)
             expect(subject[:quote]).to_not be_nil
+          end
+        end
+
+        context 'when the quoted post has a poll authored by the user' do
+          let(:poll) { Fabricate(:poll, account: account) }
+          let(:quoted_status) { Fabricate(:status, poll: poll, account: account) }
+
+          it 'renders the same attributes as a full render' do
+            expect(subject).to eql(compare_to_hash)
+          end
+        end
+
+        context 'when the quoted post has been voted in' do
+          let(:poll) { Fabricate(:poll, options: %w(Yellow Blue)) }
+          let(:quoted_status) { Fabricate(:status, poll: poll) }
+
+          before do
+            VoteService.new.call(account, poll, [0])
+          end
+
+          it 'renders the same attributes as a full render' do
+            expect(subject).to eql(compare_to_hash)
           end
         end
 

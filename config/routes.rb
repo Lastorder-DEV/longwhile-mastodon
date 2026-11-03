@@ -198,10 +198,6 @@ Rails.application.routes.draw do
 
   draw(:web_app)
 
-  # GHSA-xqw8-4j56-5hj6: use the `path:` redirect form (OptionRedirect) so the
-  # Location is built as a full absolute URL pinned to this host — an encoded
-  # path like `/web/%2Fevil.com` can no longer become a protocol-relative open
-  # redirect (matches upstream 4.4.15).
   get '/web/(*any)', to: redirect(path: '/%{any}', status: 302), as: :web, defaults: { any: '' }, format: false
   get '/about',      to: 'about#show'
   get '/about/more', to: redirect('/about')

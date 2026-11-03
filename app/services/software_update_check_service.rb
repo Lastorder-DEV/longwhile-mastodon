@@ -31,7 +31,7 @@ class SoftwareUpdateCheckService < BaseService
   end
 
   def version
-    @version ||= Mastodon::Version.to_s.split('+')[0]
+    @version ||= Mastodon::Version.upstream_version
   end
 
   def process_update_notices!(update_notices)

@@ -13,7 +13,7 @@ module Mastodon
     end
 
     def patch
-      26
+      27
     end
 
     def default_prerelease
@@ -39,8 +39,18 @@ module Mastodon
       components.join
     end
 
+    # The `longwhile` prerelease tag only marks this fork; it is not a
+    # prerelease of the upstream version. Leave it out when comparing against
+    # upstream releases, or 4.4.27-longwhile sorts below 4.4.27 and the update
+    # check always reports the running release as outdated.
+    def upstream_version
+      components = [to_a.join('.')]
+      components << "-#{prerelease}" if prerelease.present? && prerelease != default_prerelease
+      components.join
+    end
+
     def gem_version
-      @gem_version ||= Gem::Version.new(to_s.split('+')[0])
+      @gem_version ||= Gem::Version.new(upstream_version)
     end
 
     def api_versions
@@ -75,7 +85,7 @@ module Mastodon
     end
 
     def user_agent
-      @user_agent ||= "Mastodon/#{Version} (#{HTTP::Request::USER_AGENT}; +http#{Rails.configuration.x.use_https ? 's' : ''}://#{Rails.configuration.x.web_domain}/)"
+      @user_agent ||= "Mastodon/#{Version} (#{HTTP::Request::USER_AGENT}; +http#{'s' if Rails.configuration.x.use_https}://#{Rails.configuration.x.web_domain}/)"
     end
 
     def version_configuration

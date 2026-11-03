@@ -1,4 +1,5 @@
-import { Record as ImmutableRecord } from 'immutable';
+import type { UnknownAction } from '@reduxjs/toolkit';
+import { Record as ImmutableRecord, mergeDeep } from 'immutable';
 
 import { loadingBarReducer } from 'react-redux-loading-bar';
 import { combineReducers } from 'redux-immutable';
@@ -44,6 +45,7 @@ import settings from './settings';
 import status_lists from './status_lists';
 import statuses from './statuses';
 import { suggestionsReducer } from './suggestions';
+import { followedTagsReducer } from './tags';
 import timelines from './timelines';
 import trends from './trends';
 import user_lists from './user_lists';
@@ -75,6 +77,7 @@ const reducers = {
   height_cache,
   custom_emojis,
   lists: listsReducer,
+  followedTags: followedTagsReducer,
   filters,
   conversations,
   suggestions: suggestionsReducer,
@@ -112,28 +115,47 @@ const RootStateRecord = ImmutableRecord(initialRootState, 'RootState');
 
 const combinedReducer = combineReducers(reducers, RootStateRecord);
 
-const rootReducer = (state: any, action: any) => {
-  if (action?.type === RESET_ALL) {
-    const nextState = combinedReducer(undefined, action);
+type RootStateType = ReturnType<typeof combinedReducer>;
 
-    if (state?.get && nextState?.set) {
+// longwhile: RESET_ALL (account switching) rebuilds every slice except the
+// multi-account registry and `meta`, which must survive the reset.
+export const rootReducer = (
+  state: RootStateType | undefined,
+  action: UnknownAction,
+): RootStateType => {
+  if (action.type === RESET_ALL) {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return */
+    const nextState: any = combinedReducer(undefined, action);
+    const prevState: any = state;
+
+    if (prevState?.get && nextState?.set) {
       return nextState
-        .set('multiAccount', state.get('multiAccount'))
-        .set('meta', state.get('meta'));
+        .set('multiAccount', prevState.get('multiAccount'))
+        .set('meta', prevState.get('meta'));
     }
 
-    if (state && typeof state === 'object') {
+    if (prevState && typeof prevState === 'object') {
       return {
         ...nextState,
-        multiAccount: (state as any).multiAccount,
-        meta: (state as any).meta,
+        multiAccount: prevState.multiAccount,
+        meta: prevState.meta,
       };
     }
 
     return nextState;
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return */
   }
 
   return combinedReducer(state, action);
 };
 
-export { rootReducer };
+export function reducerWithInitialState(
+  stateOverrides: Record<string, unknown> = {},
+) {
+  const initialStateRecord = mergeDeep(initialRootState, stateOverrides);
+  const PatchedRootStateRecord = ImmutableRecord(
+    initialStateRecord,
+    'RootState',
+  );
+  return combineReducers(reducers, PatchedRootStateRecord);
+}

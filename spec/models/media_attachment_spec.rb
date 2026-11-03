@@ -149,13 +149,13 @@ RSpec.describe MediaAttachment, :attachment_processing do
     it_behaves_like 'static 600x400 image', 'image/webp', '.webp'
   end
 
-  describe 'avif' do
+  describe 'avif', skip: 'HEIF temporarily disabled' do
     let(:media) { Fabricate(:media_attachment, file: attachment_fixture('600x400.avif')) }
 
     it_behaves_like 'static 600x400 image', 'image/jpeg', '.jpeg'
   end
 
-  describe 'heic' do
+  describe 'heic', skip: 'HEIF temporarily disabled' do
     let(:media) { Fabricate(:media_attachment, file: attachment_fixture('600x400.heic')) }
 
     it_behaves_like 'static 600x400 image', 'image/jpeg', '.jpeg'
@@ -291,7 +291,7 @@ RSpec.describe MediaAttachment, :attachment_processing do
     let(:media) { Fabricate(:media_attachment) }
 
     before do
-      allow(Rails.configuration.x).to receive(:cache_buster_enabled).and_return(true)
+      allow(Rails.configuration.x.cache_buster).to receive(:enabled).and_return(true)
     end
 
     it 'queues CacheBusterWorker jobs' do
