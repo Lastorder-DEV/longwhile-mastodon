@@ -6,7 +6,7 @@ RSpec.describe SoftwareUpdateCheckService do
   subject { described_class.new }
 
   shared_examples 'when the feature is enabled' do
-    let(:full_update_check_url) { "#{update_check_url}?version=#{Mastodon::Version.to_s.split('+')[0]}" }
+    let(:full_update_check_url) { "#{update_check_url}?version=#{Mastodon::Version.upstream_version}" }
 
     let(:devops_role)     { Fabricate(:user_role, name: 'DevOps', permissions: UserRole::FLAGS[:view_devops]) }
     let(:owner_user)      { Fabricate(:owner_user) }
